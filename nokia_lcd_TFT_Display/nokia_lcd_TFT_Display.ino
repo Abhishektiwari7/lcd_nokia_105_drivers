@@ -73,7 +73,7 @@ display.LCD_Clear();
 }
 
 void loop() {
-displayFunctions(4);
+displayFunctions(26);
 
 }
 
@@ -177,9 +177,11 @@ void displayFunctions(int test) {
     break;
   
   case 25:
+  display.circle(64, 83, 50, YELLOW);
     break;
   
   case 26:
+  display.printDigit(100,90,50,GREEN,BLACK);;
     break;
   
   case 27:
