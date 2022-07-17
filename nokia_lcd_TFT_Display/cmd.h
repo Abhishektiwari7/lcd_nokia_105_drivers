@@ -1,6 +1,6 @@
 //work in progress
-#ifndef cmd
-#define cmd
+#ifndef _CMD_H
+#define _CMD_H
 
 #define NOKIA105_NOP                     (0x00)
 #define NOKIA105_SWRESET                 (0x01)
