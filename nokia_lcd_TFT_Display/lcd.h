@@ -1,5 +1,5 @@
-#ifndef lcd
-#define lcd
+#ifndef _LCD_H
+#define _LCD_H
 #include "Arduino.h"
 #include "fonts.h"
  //https://stackoverflow.com/questions/2660484/what-are-0x01-and-0x80-representative-of-in-c-bitwise-operations
@@ -78,6 +78,7 @@ class Nokia105 {
    				onePixel(int16_t x, int16_t y, uint16_t color),
 				image1d (int w, int h, int shiftX,int shiftY, const uint16_t image[] ),
 				/*image2d (int w, int h, int shiftX,int shiftY, const uint16_t image[][80] ),*/
+				printDigit( int a, unsigned char x, unsigned char y,uint16_t forgroundColor,uint16_t backgroundColor),
 				drawtext(unsigned char c, unsigned char x, unsigned char y ,uint16_t color),
 				fillRectangle (int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color),
 				smpteTest(),
@@ -86,6 +87,7 @@ class Nokia105 {
 				colorPalletTest(),
 				lineHorixontal(int16_t x, int16_t y, int16_t h, uint16_t color),
 				lineVertical(int16_t x, int16_t y, int16_t w,uint16_t color),
+				circle(int16_t x0, int16_t y0, int16_t r, uint16_t color),
 				LCD_Show_Char8(unsigned char c,unsigned char x, unsigned char y,uint16_t forgroundColor, uint16_t backgroundColor),
 				LCD_Show_String8 (unsigned char *String,unsigned char x,unsigned char y,uint16_t forgroundColor, uint16_t backgroundColor),
 				Show_Str(uint8_t*str,uint8_t x,uint8_t y,uint16_t forgroundColor, uint16_t backgroundColor),

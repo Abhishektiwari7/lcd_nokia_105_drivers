@@ -256,7 +256,6 @@ void Nokia105:: smpteTest() {
   fillRectangle(126,0,190,128,BLACK); // HEIGHT, WIDTH
 }
 
-//----------------------------------------//need more test------------------------------------------
 void Nokia105:: drawBitmap1(int16_t x, int16_t y, const uint8_t bitmap[],int16_t w, int16_t h, uint16_t color) {  
 //int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
 int16_t byteWidth = 16.8;
@@ -306,10 +305,69 @@ int colorPallete[] = {WHITE,BLUE,RED,GREEN,CYAN,MAGENTA,YELLOW,NAVY,DARKGREEN,DA
 }
 
 
+void Nokia105:: circle(int16_t x0, int16_t y0, int16_t r, uint16_t color) {
+  int16_t f = 1 - r;
+  int16_t ddF_x = 1;
+  int16_t ddF_y = -2 * r;
+  int16_t x = 0;
+  int16_t y = r;
+  
+  onePixel(x0, y0 + r, color);
+  onePixel(x0, y0 - r, color);
+  onePixel(x0 + r, y0, color);
+  onePixel(x0 - r, y0, color);
 
+  while (x < y) {
+    if (f >= 0) {
+      y--;
+      ddF_y += 2;
+      f += ddF_y;
+    }
+    x++;
+    ddF_x += 2;
+    f += ddF_x;
 
+    onePixel(x0 + x, y0 + y, color);
+    onePixel(x0 - x, y0 + y, color);
+    onePixel(x0 + x, y0 - y, color);
+    onePixel(x0 - x, y0 - y, color);
+    onePixel(x0 + y, y0 + x, color);
+    onePixel(x0 - y, y0 + x, color);
+    onePixel(x0 + y, y0 - x, color);
+    onePixel(x0 - y, y0 - x, color);
+  }
+}
 
+void Nokia105::  printDigit( int a, unsigned char x, unsigned char y,uint16_t forgroundColor,uint16_t backgroundColor) {
+//convet int to string to character   
+/*uint8_t sizeofinput = HEIGHT*WIDTH ;
+char connverter[sizeofinput];
+String str;
 
+str = String(a);
+str.toCharArray(connverter,sizeofinput); 
+Show_Str(connverter,x,y,forgroundColor,backgroundColor);
+*/
+
+uint8_t sizeofinput = HEIGHT*WIDTH ; //need to update //255
+char connverter[sizeofinput];
+String str;
+str = String(a);
+str.toCharArray(connverter,sizeofinput);
+//padding to avoid overlap text
+
+Show_Str(connverter,x,y,forgroundColor,backgroundColor);
+if (a < 10) { //1 digit
+  for(int i = 1; i<4; i++) 
+  Show_Str(" ",x+(i*8),y,backgroundColor,backgroundColor);
+} else if ( a >= 10 && a < 100 )  { //2 digit
+  Show_Str(" ",x+16,y,backgroundColor,backgroundColor);
+} else if ( a >= 100 && a < 1000 )  { //3 digit
+  Show_Str(" ",x+24,y,backgroundColor,backgroundColor);
+}  else if ( a >= 1000 && a < 10000 )  { //4 digit
+  Show_Str(" ",x+32,y,backgroundColor,backgroundColor);
+}
+}
 
 void Nokia105:: lineHorixontal(int16_t x, int16_t y, int16_t h, uint16_t color) {
 
