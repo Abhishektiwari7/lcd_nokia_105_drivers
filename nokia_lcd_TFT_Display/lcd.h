@@ -10,32 +10,35 @@
           |  0  |  0  |  0  |  0  |  0  |  0  |  0  |  1  |   0x01
           |  0  |  1  |  0  |  0  |  0  |  0  |  0  |  0  |   (0x80 >> 1)
           |  0  |  0  |  0  |  0  |  0  |  0  |  1  |  0  |   (0x01 << 1)*/
+/*
+ * harcoded gpio for future updates
+#define SPIDEVICE_CS    10
+#define SPIDEVICE_RES   12          //miso
+#define SPIDEVICE_SDA   11          //Mosi
+#define SPIDEVICE_SCK   13
+*/
+//----------------------------macros to Manipulate display-----------------------------------
+#define WIDTH          130
+#define HEIGHT         167             //old->160
+#define nextLineEdge   128             //printString
+#define spaceBetweenScanLines  16      //printString, 2 lines ke beech ka distance
+#define fullLengthVertical    160      //164 characters on display
+#define rotation        0              //SCREEN ROTATION 0 by default
+#define rotateBitmap90  0              //1-> no rotaion 90,0-> yes rorate 90
+#define LOG             1              //to activate serial
+#define totalPixals     WIDTH*HEIGHT   //21384
 
-//#define SPIDEVICE_CS    10
-//#define SPIDEVICE_RES   12          //miso
-//#define SPIDEVICE_SDA   11          //Mosi
-//#define SPIDEVICE_SCK   13
+//----------------------Set or Clear of bit-----digitalwrite is very slow----------------------------
+#define LCD_RES_High()   { PORTB = PORTB | B00010000; /*digitalWrite(SPIDEVICE_RES,HIGH);*/} 
+#define LCD_RES_Low()    { PORTB = PORTB & B11101111; /*digitalWrite(SPIDEVICE_RES,LOW);*/ }
+#define LCD_CS_High()    { PORTB = PORTB | B00010100; /*digitalWrite(SPIDEVICE_CS,HIGH);*/ }  
+#define LCD_CS_Low()     { PORTB = PORTB & B11111011; /*digitalWrite(SPIDEVICE_CS,LOW);*/  }
+#define LCD_SDA_High()   { PORTB = PORTB | B00001000; /*digitalWrite(SPIDEVICE_SDA,HIGH);*/} 
+#define LCD_SDA_Low()    { PORTB = PORTB & B11110111; /*digitalWrite(SPIDEVICE_SDA,LOW);*/ }
+#define LCD_SCK_High()   { PORTB = PORTB | B00100000; /*digitalWrite(SPIDEVICE_SCK,HIGH);*/}
+#define LCD_SCK_Low()    { PORTB = PORTB & B11011111; /*digitalWrite(SPIDEVICE_SCK,LOW);*/ }
 
-#define WIDTH          128
-#define HEIGHT         167           //old->160
-#define nextLineEdge   128          //Show_Str
-#define spaceBetweenScanLines  16   //Show_Str, 2 lines ke beech ka distance
-#define fullLengthVertical    160   // 164 characters on display
-#define rotation        0 //SCREEN ROTATION 0 by default
-#define rotateBitmap90  0 //1-> no rotaion 90,0-> yes rorate 90
-#define LOG             1 //to activate serial
-#define totalPixals     WIDTH*HEIGHT  //21384
-
-#define LCD_RES_High()   { /*digitalWrite(SPIDEVICE_RES,HIGH);*/ PORTB = PORTB | B00010000; } 
-#define LCD_RES_Low()    { /*digitalWrite(SPIDEVICE_RES,LOW);*/ PORTB = PORTB & B11101111;  }
-#define LCD_CS_High()    { /*digitalWrite(SPIDEVICE_CS,HIGH);*/ PORTB = PORTB | B00010100;  }  
-#define LCD_CS_Low()     { /*digitalWrite(SPIDEVICE_CS,LOW);*/  PORTB = PORTB & B11111011;  }
-#define LCD_SDA_High()   { /*digitalWrite(SPIDEVICE_SDA,HIGH);*/PORTB = PORTB | B00001000;  } 
-#define LCD_SDA_Low()    { /*digitalWrite(SPIDEVICE_SDA,LOW);*/PORTB = PORTB & B11110111;   }
-#define LCD_SCK_High()   { /*digitalWrite(SPIDEVICE_SCK,HIGH);*/ PORTB = PORTB | B00100000; }
-#define LCD_SCK_Low()    { /*digitalWrite(SPIDEVICE_SCK,LOW);*/PORTB = PORTB & B11011111;   }
-
-//16 bit colors
+//----------predefined 16 bit colors
 
 #define BLACK             0x0000
 #define NAVY              0x000F
@@ -57,60 +60,201 @@
 #define GREENYELLOW       0xAFE5
 #define PINK              0xF81F
 
-#define textColor            GREEN  //text color
-//int colorPallete[] = {BLACK,BLUE,RED,GREEN,CYAN,MAGENTA,YELLOW,WHITE};
-/**********************************************************************/
-  /*!
-    @brief    Prints the current contents of the canvas to Serial
-    @param    rotated  true to print according to the current GFX rotation,
-    false to print to the native rotation of the canvas (or unrotated).
-  */
-  /**********************************************************************/
-
 class Nokia105 {
 	public:
   		Nokia105(int8_t SID, int8_t SCLK, int8_t RST, int8_t CS);
-  		//Nokia105(int8_t RST, int8_t CS);
-
-		void	LCD_Init(),
-            	LCD_SET_XY(unsigned char x, unsigned char y),
-    			setWindow1(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1),
-   				onePixel(int16_t x, int16_t y, uint16_t color),
-				image1d (int w, int h, int shiftX,int shiftY, const uint16_t image[] ),
+		/**********************************************************************/
+  /*!
+    @brief    Pin defination
+    @param    SPIDEVICE_CS, SPIDEVICE_RES, SPIDEVICE_SDA or Mosi, SPIDEVICE_SCK
+    spi proceed by defined gpio.
+  */
+  /**********************************************************************/
+		
+		void	initDisplay(),
+  /**********************************************************************/
+  /*!
+    @brief    lcd initialize
+    @param    
+  */
+  /**********************************************************************/
+        
+        setDrawPosition(unsigned char x, unsigned char y),
+    /**********************************************************************/
+  /*!
+    @brief    set window cursor to push colors
+    @param    x-> number of pixels in x axis or horizontal, y>x-> number of pixels in y axis or vertical
+  */
+  /**********************************************************************/
+        
+        setDrawPositionAxis(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1),
+  /**********************************************************************/
+  /*!
+    @brief    set window cursor to push colors
+    @param    x-> number of pixels in x axis or horizontal, y>x-> number of pixels in y axis or vertical
+    x0: start position | x1: end position 
+    y0: start position | y1: end position
+  */
+  /**********************************************************************/
+  
+   			drawPixel(int16_t x, int16_t y, uint16_t color), 
+	/**********************************************************************/
+  /*!
+    @brief    as function name says, it drae 1 pixel on screen
+    @param    x: horizonal position, y: vertical position,color: 16 bit color in hex
+  */
+  /**********************************************************************/
+	
+				image1d (uint16_t w, uint16_t h, uint16_t shiftX,uint16_t shiftY, const uint16_t image[] ),
+	/**********************************************************************/
+  /*!
+    @brief    Pin defination
+    @param    
+  */
+  /**********************************************************************/
+	
 				/*image2d (int w, int h, int shiftX,int shiftY, const uint16_t image[][80] ),*/
-				printDigit( int a, unsigned char x, unsigned char y,uint16_t forgroundColor,uint16_t backgroundColor),
+  /**********************************************************************/
+  /*!
+    @brief    Pin defination
+    @param    
+  */
+  /**********************************************************************/
+				
+				printDigit(unsigned int a, int16_t x, int16_t y,uint16_t forgroundColor,uint16_t backgroundColor),
+  /**********************************************************************/
+  /*!
+    @brief    digit print working upto 10,000 only unsigned integers 
+    @param    
+  */
+  /**********************************************************************/
+
 				drawtext(unsigned char c, unsigned char x, unsigned char y ,uint16_t color),
+  /**********************************************************************/
+  /*!
+    @brief    as per function name. it draw the text but it is in beta.
+    @param    
+  */
+  /**********************************************************************/
+				
 				fillRectangle (int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color),
+  /**********************************************************************/
+  /*!
+    @brief    rectanglle  shape color 
+    @param    
+  */
+  /**********************************************************************/
+	
 				smpteTest(),
-				drawBitmap1(int16_t x, int16_t y, const uint8_t bitmap[],int16_t w, int16_t h, uint16_t color),
+  /**********************************************************************/
+  /*!
+    @brief    colorfull rectangles
+    @param    
+  */
+  /**********************************************************************/
+	
+				printBitmap(int16_t x, int16_t y, const uint8_t bitmap[],int16_t w, int16_t h, uint16_t color),
+	/**********************************************************************/
+  /*!
+    @brief    bitmap 
+    @param    
+  */
+  /**********************************************************************/
+	
 				backgroundColor(uint16_t c),
+  /**********************************************************************/
+  /*!
+    @brief    fill the screen by passing the color value
+    @param    
+  */
+  /**********************************************************************/
+	
 				colorPalletTest(),
+  /**********************************************************************/
+  /*!
+    @brief    colors flash on screen
+    @param   
+  */
+  /**********************************************************************/
+	
 				lineHorixontal(int16_t x, int16_t y, int16_t h, uint16_t color),
+  /**********************************************************************/
+  /*!
+    @brief    horizontal line
+    @param    
+  */
+  /**********************************************************************/
+	
 				lineVertical(int16_t x, int16_t y, int16_t w,uint16_t color),
+  /**********************************************************************/
+  /*!
+    @brief    vertical line
+    @param    
+  */
+  /**********************************************************************/
+				
 				circle(int16_t x0, int16_t y0, int16_t r, uint16_t color),
-				LCD_Show_Char8(unsigned char c,unsigned char x, unsigned char y,uint16_t forgroundColor, uint16_t backgroundColor),
-				LCD_Show_String8 (unsigned char *String,unsigned char x,unsigned char y,uint16_t forgroundColor, uint16_t backgroundColor),
-				Show_Str(uint8_t*str,uint8_t x,uint8_t y,uint16_t forgroundColor, uint16_t backgroundColor),
-				LCD_Clear();
+  /**********************************************************************/
+  /*!
+    @brief    draw circle
+    @param    
+  */
+  /**********************************************************************/
+	
+				printSingleChar(unsigned char c,unsigned char x, unsigned char y,uint16_t forgroundColor, uint16_t backgroundColor),
+  /**********************************************************************/
+  /*!
+    @brief    single charatcer only
+    @param   
+  */
+  /**********************************************************************/
+	
+				printStringChar (unsigned char *String,unsigned char x,unsigned char y,uint16_t forgroundColor, uint16_t backgroundColor),
+  /**********************************************************************/
+  /*!
+    @brief    string of data without next line feature
+    @param    .
+  */
+  /**********************************************************************/
+	
+				printString(uint8_t*str,uint8_t x,uint8_t y,uint16_t forgroundColor, uint16_t backgroundColor),
+  /**********************************************************************/
+  /*!
+    @brief    Print String of character with next line feature
+    @param    
+  */
+  /**********************************************************************/
+	
+				displayClear();
+  /**********************************************************************/
+  /*!
+    @brief    Display Clear
+    @param    
+  */
+  /**********************************************************************/
 
 	private:
-  		void	LCD_Write_Cmd(unsigned char c),
-				LCD_Write_Data(unsigned char c);
+  		void	writeNokiaCommand(unsigned char c),
+  /**********************************************************************/
+  /*!
+    @brief    write SPI command to nokia display
+    @param    
+  */
+  /**********************************************************************/
+	
+				writeNokiaData(unsigned char c);
+  /**********************************************************************/
+  /*!
+    @brief    write SPI data to nokia display
+    @param    
+  */
+  /**********************************************************************/
 
   		bool hwSPI; //use gpio or spi interface hardware
 
   		int8_t	SPIDEVICE_CS,
-				SPIDEVICE_RES,    //miso
-				SPIDEVICE_SDA,	//Mosi
-				SPIDEVICE_SCK;
-
-  		//volatile uint8_t	*dataport,
-  			//				*clkport,
-  				//			*csport;
-
-  	//	uint8_t	datapinmask,
-  		//		clkpinmask,
-  		//		cspinmask,
-  		//		spi_save;
+				      SPIDEVICE_RES,  //miso
+				      SPIDEVICE_SDA,	//Mosi
+				      SPIDEVICE_SCK;
 };
 #endif
