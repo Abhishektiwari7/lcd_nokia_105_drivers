@@ -65,8 +65,8 @@
 
 class Nokia105 : public Adafruit_GFX {
 	public:
-  		Nokia105(int8_t SID, int8_t SCLK, int8_t RST, int8_t CS);
-		/**********************************************************************/
+  	Nokia105(int8_t SID, int8_t SCLK, int8_t RST, int8_t CS);
+	/**********************************************************************/
   /*!
     @brief    Pin defination
     @param    SPIDEVICE_CS, SPIDEVICE_RES, SPIDEVICE_SDA or Mosi, SPIDEVICE_SCK
@@ -81,16 +81,32 @@ class Nokia105 : public Adafruit_GFX {
     @param    
   */
   /**********************************************************************/
-        
-        setDrawPosition(unsigned char x, unsigned char y),
-    /**********************************************************************/
+      
+      PWMinit(),    
+  /**********************************************************************/
+  /*!
+    @brief    start the inbuilt timers to generate pwm
+    @param    
+  */
+  /**********************************************************************/
+
+      setLcdBrightness(uint16_t PWM),    
+  /**********************************************************************/
+  /*!
+    @brief    simple map the input 16 bit values to counter
+    @param    
+  */
+  /**********************************************************************/
+
+      setDrawPosition(unsigned char x, unsigned char y),
+  /**********************************************************************/
   /*!
     @brief    set window cursor to push colors
     @param    x-> number of pixels in x axis or horizontal, y>x-> number of pixels in y axis or vertical
   */
   /**********************************************************************/
         
-        setDrawPositionAxis(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1),
+      setDrawPositionAxis(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1),
   /**********************************************************************/
   /*!
     @brief    set window cursor to push colors
@@ -100,7 +116,7 @@ class Nokia105 : public Adafruit_GFX {
   */
   /**********************************************************************/
   
-   			drawPixel(int16_t x, int16_t y, uint16_t color), 
+   		drawPixel(int16_t x, int16_t y, uint16_t color), 
 	/**********************************************************************/
   /*!
     @brief    as function name says, it drae 1 pixel on screen
@@ -109,7 +125,7 @@ class Nokia105 : public Adafruit_GFX {
   */
   /**********************************************************************/
 	
-				image1d (uint16_t w, uint16_t h, uint16_t shiftX,uint16_t shiftY, const uint16_t image[] ),
+			image1d (uint16_t w, uint16_t h, uint16_t shiftX,uint16_t shiftY, const uint16_t image[] ),
 	/**********************************************************************/
   /*!
     @brief    Pin defination
@@ -117,7 +133,7 @@ class Nokia105 : public Adafruit_GFX {
   */
   /**********************************************************************/
 	
-				/*image2d (int w, int h, int shiftX,int shiftY, const uint16_t image[][80] ),*/
+		/*image2d (int w, int h, int shiftX,int shiftY, const uint16_t image[][80] ),*/
   /**********************************************************************/
   /*!
     @brief    Pin defination
@@ -125,7 +141,7 @@ class Nokia105 : public Adafruit_GFX {
   */
   /**********************************************************************/
 				
-				printDigit(unsigned int a, int16_t x, int16_t y,uint16_t forgroundColor,uint16_t backgroundColor),
+			printDigit(unsigned int a, int16_t x, int16_t y,uint16_t forgroundColor,uint16_t backgroundColor),
   /**********************************************************************/
   /*!
     @brief    digit print working upto 10,000 only unsigned integers 
@@ -133,7 +149,7 @@ class Nokia105 : public Adafruit_GFX {
   */
   /**********************************************************************/
 
-				drawtext(unsigned char c, unsigned char x, unsigned char y ,uint16_t color),
+			drawtext(unsigned char c, unsigned char x, unsigned char y ,uint16_t color),
   /**********************************************************************/
   /*!
     @brief    as per function name. it draw the text but it is in beta.
@@ -141,7 +157,7 @@ class Nokia105 : public Adafruit_GFX {
   */
   /**********************************************************************/
 				
-				fillRectangle (int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color),
+			fillRectangle (int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color),
   /**********************************************************************/
   /*!
     @brief    rectanglle  shape color 
@@ -149,7 +165,7 @@ class Nokia105 : public Adafruit_GFX {
   */
   /**********************************************************************/
 	
-				smpteTest(),
+			smpteTest(),
   /**********************************************************************/
   /*!
     @brief    colorfull rectangles
@@ -157,7 +173,7 @@ class Nokia105 : public Adafruit_GFX {
   */
   /**********************************************************************/
 	
-				printBitmap(int16_t x, int16_t y, const uint8_t bitmap[],int16_t w, int16_t h, uint16_t color),
+			printBitmap(int16_t x, int16_t y, const uint8_t bitmap[],int16_t w, int16_t h, uint16_t color),
 	/**********************************************************************/
   /*!
     @brief    bitmap 
@@ -165,7 +181,7 @@ class Nokia105 : public Adafruit_GFX {
   */
   /**********************************************************************/
 	
-				backgroundColor(uint16_t c),
+			backgroundColor(uint16_t c),
   /**********************************************************************/
   /*!
     @brief    fill the screen by passing the color value
@@ -173,7 +189,7 @@ class Nokia105 : public Adafruit_GFX {
   */
   /**********************************************************************/
 	
-				colorPalletTest(),
+			colorPalletTest(),
   /**********************************************************************/
   /*!
     @brief    colors flash on screen
@@ -181,7 +197,7 @@ class Nokia105 : public Adafruit_GFX {
   */
   /**********************************************************************/
 	
-				lineHorixontal(int16_t x, int16_t y, int16_t h, uint16_t color),
+			lineHorixontal(int16_t x, int16_t y, int16_t h, uint16_t color),
   /**********************************************************************/
   /*!
     @brief    horizontal line
@@ -189,7 +205,7 @@ class Nokia105 : public Adafruit_GFX {
   */
   /**********************************************************************/
 	
-				lineVertical(int16_t x, int16_t y, int16_t w,uint16_t color),
+			lineVertical(int16_t x, int16_t y, int16_t w,uint16_t color),
   /**********************************************************************/
   /*!
     @brief    vertical line
@@ -197,7 +213,7 @@ class Nokia105 : public Adafruit_GFX {
   */
   /**********************************************************************/
 				
-				circle(int16_t x0, int16_t y0, int16_t r, uint16_t color),
+			circle(int16_t x0, int16_t y0, int16_t r, uint16_t color),
   /**********************************************************************/
   /*!
     @brief    draw circle
@@ -205,7 +221,7 @@ class Nokia105 : public Adafruit_GFX {
   */
   /**********************************************************************/
 	
-				printSingleChar(unsigned char c,unsigned char x, unsigned char y,uint16_t forgroundColor, uint16_t backgroundColor),
+			printSingleChar(unsigned char c,unsigned char x, unsigned char y,uint16_t forgroundColor, uint16_t backgroundColor),
   /**********************************************************************/
   /*!
     @brief    single charatcer only
@@ -213,7 +229,7 @@ class Nokia105 : public Adafruit_GFX {
   */
   /**********************************************************************/
 	
-				printStringChar (unsigned char *String,unsigned char x,unsigned char y,uint16_t forgroundColor, uint16_t backgroundColor),
+			printStringChar (unsigned char *String,unsigned char x,unsigned char y,uint16_t forgroundColor, uint16_t backgroundColor),
   /**********************************************************************/
   /*!
     @brief    string of data without next line feature
@@ -221,7 +237,7 @@ class Nokia105 : public Adafruit_GFX {
   */
   /**********************************************************************/
 	
-				printString(uint8_t*str,uint8_t x,uint8_t y,uint16_t forgroundColor, uint16_t backgroundColor),
+			printString(uint8_t*str,uint8_t x,uint8_t y,uint16_t forgroundColor, uint16_t backgroundColor),
   /**********************************************************************/
   /*!
     @brief    Print String of character with next line feature
@@ -229,7 +245,7 @@ class Nokia105 : public Adafruit_GFX {
   */
   /**********************************************************************/
 	
-				displayClear();
+			displayClear();
   /**********************************************************************/
   /*!
     @brief    Display Clear
@@ -238,7 +254,7 @@ class Nokia105 : public Adafruit_GFX {
   /**********************************************************************/
 
 	private:
-  		void	writeNokiaCommand(unsigned char c),
+  	void	writeNokiaCommand(unsigned char c),
   /**********************************************************************/
   /*!
     @brief    write SPI command to nokia display
@@ -246,7 +262,7 @@ class Nokia105 : public Adafruit_GFX {
   */
   /**********************************************************************/
 	
-				writeNokiaData(unsigned char c);
+			writeNokiaData(unsigned char c);
   /**********************************************************************/
   /*!
     @brief    write SPI data to nokia display
