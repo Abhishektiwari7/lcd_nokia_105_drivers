@@ -456,3 +456,29 @@ while(*str!=0) {
     x+=8; 
   }
 } 
+
+void Nokia105:: PWMinit() {
+//https://forum.arduino.cc/t/pwm-pin-9-using-registers-solved/673183
+DDRB |= 1<<DDB1; //PIN DIGITAL 9 AS OUTPUT
+
+TCCR1A = 0; //DISABLE ALL FEATURE OF TIMERS
+TCCR1B = 0; //DISABLE ALL FEATURE OF TIMERS
+
+TIMSK1 = 0; //Interrupt Mask Register
+TIFR1 = 0; // Interrupt Flag Register
+
+ICR1 = 65535; //16 bit: 65535, TOP VALUE, Input Capture Flag
+
+OCR1A = 0; //set Initial PWM =0
+
+TCCR1B |= 1<<CS10; //max Frequency:~243hz/4.1millisecond, (CS12=0,CS11=0,CS10=1)N0 Prescalling,Control Register B
+
+TCCR1A |= 1<<WGM11;  //mode 14
+TCCR1B |= (1<<WGM13) | (1<<WGM12); //CTC1 (WGM13 bit set Fast PWM Mode)Clear OC1A on Compare Match, set OC1A at BOTTOM (non-inverting mode)
+
+TCCR1A |= 1<<COM1A1;  // Enable Fast PWM on Pin 9: Set OC1A at BOTTOM and clear OC1A on OCR1A compare
+}
+
+void Nokia105:: setLcdBrightness(uint16_t PWM) {
+OCR1A = map(PWM, 0, 1023, 0, 65535); //BOTTOM VALUE
+}

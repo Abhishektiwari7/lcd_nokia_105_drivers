@@ -52,6 +52,7 @@
 #define SCLK          13
 #define SID           11 //Mosi
 #define BAUD_RATE     9600
+//PWM Brightness pin 9: PB1: 15: OC1A
 
 Nokia105 display( SID,  SCLK, _RESET, _CS);
 
@@ -62,6 +63,8 @@ if (LOG) {
 }
 
 display.initDisplay();
+display.PWMinit();
+display.setLcdBrightness(1000); //16 BIT value only
 display.setDrawPosition(128,160); 
 display.backgroundColor(BLUE);
 display.displayClear();
@@ -69,6 +72,7 @@ display.displayClear();
 }
 
 void loop() {
+//display.setLcdBrightness(analogRead(A2));
 //display.printDigit(analogRead(A2),100,100,GREEN,BLACK);
 displayFunctions(21);
 //displayFunctions(5);
