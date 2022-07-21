@@ -289,7 +289,7 @@ for( y = HEIGHT; y > 0; y--) {
 
 void Nokia105:: colorPalletTest() {
 int colorPallete[] = {WHITE,BLUE,RED,GREEN,CYAN,MAGENTA,YELLOW,NAVY,DARKGREEN,DARKCYAN,MAROON,PURPLE,OLIVE,LIGHTGREY,DARKGREY,ORANGE,PINK};
-  for(int i=0; i < sizeof(colorPallete); i++) {
+  for(int i=0; i < 10; i++) {
     //Generate complete frame
       for (int y = 0; y < HEIGHT-1; y++) {
       for (int x = 0; x < WIDTH-1; x++) {
@@ -297,6 +297,7 @@ int colorPallete[] = {WHITE,BLUE,RED,GREEN,CYAN,MAGENTA,YELLOW,NAVY,DARKGREEN,DA
         writeNokiaData(colorPallete[i]);
       }
     }
+    delay(800);
     displayClear(); //by this no over lapping  
   }  
 }
@@ -430,14 +431,16 @@ for (Mline = 0; Mline < 16; Mline++) { //font has 16 rows of data
 }
 }
 
-void Nokia105:: printStringChar(unsigned char *String,unsigned char x,unsigned char y,uint16_t forgroundColor, uint16_t backgroundColor) {
+//void Nokia105:: printStringChar(unsigned char *String,unsigned char x,unsigned char y,uint16_t forgroundColor, uint16_t backgroundColor) {
+void Nokia105:: printStringChar( char *String,unsigned char x,unsigned char y,uint16_t forgroundColor, uint16_t backgroundColor) {
 while ( * String ) {
   printSingleChar ( *String++,x,y,forgroundColor,backgroundColor);
   x+=8;     
 }
 }
 
-void Nokia105:: printString(uint8_t*str,uint8_t x,uint8_t y,uint16_t forgroundColor, uint16_t backgroundColor) {                              
+//void Nokia105:: printString(uint8_t *str,uint8_t x,uint8_t y,uint16_t forgroundColor, uint16_t backgroundColor) {                              
+void Nokia105:: printString(char *str,uint8_t x,uint8_t y,uint16_t forgroundColor, uint16_t backgroundColor) {                              
 while(*str!=0) { 
   if (x > nextLineEdge) {        // old->112          
      y += spaceBetweenScanLines; //old->16
@@ -460,6 +463,7 @@ while(*str!=0) {
 } 
 
 void Nokia105:: PWMinit() {
+#ifdef ARDUINO_ARCH_AVR
 //https://forum.arduino.cc/t/pwm-pin-9-using-registers-solved/673183
 DDRB |= 1<<DDB1; //PIN DIGITAL 9 AS OUTPUT
 
@@ -479,8 +483,19 @@ TCCR1A |= 1<<WGM11;  //mode 14
 TCCR1B |= (1<<WGM13) | (1<<WGM12); //CTC1 (WGM13 bit set Fast PWM Mode)Clear OC1A on Compare Match, set OC1A at BOTTOM (non-inverting mode)
 
 TCCR1A |= 1<<COM1A1;  // Enable Fast PWM on Pin 9: Set OC1A at BOTTOM and clear OC1A on OCR1A compare
+#elif defined ARDUINO_ARCH_ESP32 
+//esp32 timer
+#else 
+  #error Timer not supported
+#endif 
 }
 
 void Nokia105:: setLcdBrightness(uint16_t PWM) {
+#ifdef ARDUINO_ARCH_AVR
 OCR1A = map(PWM, 0, 1023, 0, 65535); //BOTTOM VALUE
+#elif defined ARDUINO_ARCH_ESP32 
+//esp32 timer
+#else 
+  #error Timer not supported
+#endif 
 }

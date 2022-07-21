@@ -14,43 +14,28 @@
   | 11: LED+            |
   | 12: GND             |
 //-----------------------
-  IMPORTANT LINK:
-  1.https://forum.arduino.cc/t/nokia-c1-1616-display/931571/8 
-  2.https://github.com/fire0shadow/Adafruit-SPFD54124B
-  3.http://uglyduck.vajn.icu/PDF/lcd/Nokia1202/Nokia_1202_LCD.html
-  4.https://github.com/fire0shadow/Adafruit-SPFD54124B/blob/master/examples/SPFD54124B.ino
-  5.https://github.com/SodaqMoja/Sodaq_DS3231/issues/5
-  6.https://www.avrfreaks.net/forum/atmega328p-nokia-1616-tft-color-streaking
-  7.https://github.com/Bodmer/TFT_eSPI
-  8.https://www.amobbs.com/thread-5099383-1-1.html
-  9.https://chowdera.com/2021/07/20210726190916525c.html
-  10.https://github.com/FeatherHunter/STM32F4/blob/master/HARDWARE/LCD/lcd.h
-  11.https://roboticsbackend.com/arduino-fast-digitalwrite/
-  12.https://docs.google.com/spreadsheets/d/11NiqGfhY6hEn82NVkdbyhqLUGae0Sy1m_vwhqrpiItQ/edit#gid=1863870689
-  13.https://radiokot.ru/forum/viewtopic.php?f=61&t=78889&sid=bd6f4e0a31b3de5cc3a78866aa3be72b
-  14.https://www.radiokot.ru/konkursCatDay2017/44/
-  15.https://forum.arduino.cc/t/problem-with-nokia-1616-lcd-adafruit-library/695003
-  16.https://arduino.ru/forum/apparatnye-voprosy/tft-nokia-1661
-  17.https://github.com/Sisoog/Nokia-1616-1661-TFT-Library/releases
-  18.https://github.com/cbm80amiga
-  jackpot
-  19.https://radiokot.ru/articles/53/
-  20.https://we-easyelectronics-ru.translate.goog/lcd_gfx/podklyuchenie-displeya-nokia-1616-na-primere-lpc1343.html?_x_tr_sch=http&_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en-GB
-  21.http://we.easyelectronics.ru/lcd_gfx/osvaivaem-displei-ot-mobilnyh-telefonov.html
-  22.https://serdisplib-sourceforge-net.translate.goog/ser/nokcol_15g10.html?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en-GB&_x_tr_sch=http
-  imagesprocessing
-  23.https://avr64-com.translate.goog/1400/11/13/%D9%86%D9%85%D8%A7%DB%8C%D8%B4-%D8%B9%DA%A9%D8%B3-%D8%AF%D8%B1-lcd-nokia-1616-c1/?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en-GB
-  24.https://kbiva.wordpress.com/2015/07/05/nokia-6151-lcd/#more-1299
 */
+#ifdef ARDUINO_ARCH_AVR
+const int _CS         = 10;
+const int _RESET      = 12;
+const int SCLK        = 13;
+const int SID         = 11; //Mosi
+
+#elif defined ARDUINO_ARCH_ESP32
+const int _CS         = 18;
+const int _RESET      = 19;
+const int SCLK        = 23;
+const int SID         = 21; //Mosi
+
+#else 
+    #error Processor not supported
+#endif 
+
 
 #include <Adafruit_GFX.h>
 #include "lcd.h"
 #include "image.h"
 
-#define _CS           10
-#define _RESET        12
-#define SCLK          13
-#define SID           11 //Mosi
 #define BAUD_RATE     9600
 //PWM Brightness pin 9: PB1: 15: OC1A
 
@@ -64,6 +49,7 @@ if (LOG) {
 
 display.initDisplay();
 display.PWMinit();
+display.setLcdBrightness(1000);  
 display.setDrawPosition(128,160); 
 display.backgroundColor(BLUE);
 display.displayClear();
@@ -71,9 +57,12 @@ display.setLcdBrightness(1000); //16 BIT value only
 }
 
 void loop() {
-//display.setLcdBrightness(analogRead(A2));
-displayFunctions(4);
-display.printDigit(analogRead(A2),10,10,GREEN,BLACK);
+for(int i = 1; i<55;i++){
+displayFunctions(i);
+delay(3000);
+display.displayClear();
+}
+//display.printDigit(analogRead(A2),10,10,GREEN,BLACK);
 }
 
 void displayFunctions(int test) {
@@ -88,7 +77,7 @@ void displayFunctions(int test) {
     break;
   
   case 3:
-    display.fillRectangle(0,0,18,128,WHITE);   // HEIGHTYPOS, WIDTHXPOS, STARTYPOS, STARTXPOS, ENDY,ENDX
+    display.fillRectangle(10,10,18,128,WHITE);   // HEIGHTYPOS, WIDTHXPOS, STARTYPOS, STARTXPOS, ENDY,ENDX
     break;
   
   case 4:
@@ -100,11 +89,11 @@ void displayFunctions(int test) {
     break;
   
   case 6:
-//    display.printBitmap(0,0,bitImage,128,64,YELLOW); //x axis, y axis, bit map,bitmap size
+   display.printBitmap(0,0,bitImage,128,100,RED); //x axis, y axis, bit map,bitmap size
     break;
   
   case 7:
-    //display.printBitmap(0,50,myBitmap,128,64,YELLOW); //x axis, y axis, bit map,bitmap size
+    display.printBitmap(0,50,bitImage,128,100,ORANGE); //x axis, y axis, bit map,bitmap size
     break;
   
   case 8:
@@ -116,11 +105,11 @@ void displayFunctions(int test) {
     break;
   
   case 10:
-    display.printString("             ",0,10,GREEN,BLACK);
+    display.printString("blank             ",0,10,GREEN,BLACK);
     break;
   
   case 11:
-    display.printString("/{}[]",0,20,GREEN,BLACK);
+    display.printString("[]",0,20,GREEN,BLACK);
     break;
   
   case 12:
@@ -168,7 +157,7 @@ void displayFunctions(int test) {
     break;
   
   case 23:
-   //display.image1d ( 125, 110, 0,0, abhishek );
+    display.image1d ( 125, 110, 0,0, abhishek );
     break;
   
   case 24:
@@ -176,11 +165,11 @@ void displayFunctions(int test) {
     break;
   
   case 25:
-  display.circle(64, 83, 50, YELLOW);
+    display.circle(64, 83, 50, YELLOW);
     break;
   
   case 26:
-  display.printDigit(100,10,10,GREEN,BLACK);
+    display.printDigit(100,10,10,GREEN,BLACK);
     break;
   
   case 27:
@@ -189,10 +178,12 @@ void displayFunctions(int test) {
     
   case 28:
     display.setTextSize(3);
+    display.print("BIG Size");
     break;
   
   case 29:
     display.setTextColor(WHITE);
+    display.print("Color");
     break;
   
   case 30:
@@ -200,6 +191,8 @@ void displayFunctions(int test) {
     break;
   
   case 31:
+    display.setTextColor(GREEN);
+    display.setTextSize(1);
     display.print("using gfx library");
     break;
   
@@ -259,27 +252,27 @@ void displayFunctions(int test) {
     break;
   
   case 46:
-    //display.drawBitmap(10, 10, bitImage, 128,64, YELLOW); //worked
+    display.drawBitmap(10, 10, bitImage, 128,100, GREEN); //worked
     break;
   
   case 47:
-    //display.drawBitmap(10, 10, bitImage, 128,64, YELLOW,GREEN); //worked
+    display.drawBitmap(10, 10, bitImage, 128,100, ORANGE,BLACK); //worked
     break;
   
   case 48:
-    //display.drawBitmap(10, 10, bitImage, 128,64, YELLOW); //*bitmap //worked
+    display.drawBitmap(10, 10, bitImage, 128,100, PINK); //*bitmap //worked
     break;
   
   case 49:
-   // display.drawBitmap(10, 10, bitImage, 128,64, YELLOW,BLACK); //worked
+    display.drawBitmap(10, 10, bitImage, 128,100, WHITE,BLACK); //worked
     break;
   
   case 50:
-   // display.drawRGBBitmap(10, 10, ram, 125,110);
+    display.drawRGBBitmap(10, 10, ram, 125,110);
     break;
   
   case 51:
-    //display.drawRGBBitmap(10, 10, ram, 125,110);
+    display.drawRGBBitmap(10, 10, ram, 125,110);
     break;
   
   case 52:
@@ -335,3 +328,31 @@ void displayFunctions(int test) {
     break;
   }
 }
+/* IMPORTANT LINK:
+  1.https://forum.arduino.cc/t/nokia-c1-1616-display/931571/8 
+  2.https://github.com/fire0shadow/Adafruit-SPFD54124B
+  3.http://uglyduck.vajn.icu/PDF/lcd/Nokia1202/Nokia_1202_LCD.html
+  4.https://github.com/fire0shadow/Adafruit-SPFD54124B/blob/master/examples/SPFD54124B.ino
+  5.https://github.com/SodaqMoja/Sodaq_DS3231/issues/5
+  6.https://www.avrfreaks.net/forum/atmega328p-nokia-1616-tft-color-streaking
+  7.https://github.com/Bodmer/TFT_eSPI
+  8.https://www.amobbs.com/thread-5099383-1-1.html
+  9.https://chowdera.com/2021/07/20210726190916525c.html
+  10.https://github.com/FeatherHunter/STM32F4/blob/master/HARDWARE/LCD/lcd.h
+  11.https://roboticsbackend.com/arduino-fast-digitalwrite/
+  12.https://docs.google.com/spreadsheets/d/11NiqGfhY6hEn82NVkdbyhqLUGae0Sy1m_vwhqrpiItQ/edit#gid=1863870689
+  13.https://radiokot.ru/forum/viewtopic.php?f=61&t=78889&sid=bd6f4e0a31b3de5cc3a78866aa3be72b
+  14.https://www.radiokot.ru/konkursCatDay2017/44/
+  15.https://forum.arduino.cc/t/problem-with-nokia-1616-lcd-adafruit-library/695003
+  16.https://arduino.ru/forum/apparatnye-voprosy/tft-nokia-1661
+  17.https://github.com/Sisoog/Nokia-1616-1661-TFT-Library/releases
+  18.https://github.com/cbm80amiga
+  jackpot
+  19.https://radiokot.ru/articles/53/
+  20.https://we-easyelectronics-ru.translate.goog/lcd_gfx/podklyuchenie-displeya-nokia-1616-na-primere-lpc1343.html?_x_tr_sch=http&_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en-GB
+  21.http://we.easyelectronics.ru/lcd_gfx/osvaivaem-displei-ot-mobilnyh-telefonov.html
+  22.https://serdisplib-sourceforge-net.translate.goog/ser/nokcol_15g10.html?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en-GB&_x_tr_sch=http
+  imagesprocessing
+  23.https://avr64-com.translate.goog/1400/11/13/%D9%86%D9%85%D8%A7%DB%8C%D8%B4-%D8%B9%DA%A9%D8%B3-%D8%AF%D8%B1-lcd-nokia-1616-c1/?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en-GB
+  24.https://kbiva.wordpress.com/2015/07/05/nokia-6151-lcd/#more-1299
+*/
