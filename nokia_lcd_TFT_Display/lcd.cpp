@@ -295,6 +295,7 @@ int colorPallete[] = {WHITE,BLUE,RED,GREEN,CYAN,MAGENTA,YELLOW,NAVY,DARKGREEN,DA
         writeNokiaData(colorPallete[i]);
       }
     }
+    delay(800);
     displayClear(); //by this no over lapping  
   }  
 }
@@ -481,7 +482,8 @@ TCCR1B |= (1<<WGM13) | (1<<WGM12); //CTC1 (WGM13 bit set Fast PWM Mode)Clear OC1
 
 TCCR1A |= 1<<COM1A1;  // Enable Fast PWM on Pin 9: Set OC1A at BOTTOM and clear OC1A on OCR1A compare
 #elif defined ARDUINO_ARCH_ESP32 
-//esp32 timer
+ledcSetup(ledChannel, freq, resolution);
+ledcAttachPin(backLightPin, ledChannel);
 #else 
   #error Timer not supported
 #endif 
@@ -491,7 +493,7 @@ void Nokia105:: setLcdBrightness(uint16_t PWM) {
 #ifdef ARDUINO_ARCH_AVR
 OCR1A = map(PWM, 0, 1023, 0, 65535); //BOTTOM VALUE
 #elif defined ARDUINO_ARCH_ESP32 
-//esp32 timer
+ledcWrite(ledChannel, PWM); //dutycycle 
 #else 
   #error Timer not supported
 #endif 

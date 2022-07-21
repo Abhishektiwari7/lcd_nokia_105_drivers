@@ -39,6 +39,11 @@ int maskSPIDEVICE_SDA = digitalPinToBitMask(SPIDEVICE_SDA);
 #define LCD_SDA_Low()    { GPIO.out_w1tc = ((uint32_t)1 << SPIDEVICE_SDA);  } //digitalWrite(SPIDEVICE_SDA,LOW);  }//PORTB = PORTB & B11110111;  }
 #define LCD_SCK_High()   { GPIO.out_w1ts = ((uint32_t)1 << SPIDEVICE_SCK);  } // digitalWrite(SPIDEVICE_SCK,HIGH); }//PORTB = PORTB | B00100000;}
 #define LCD_SCK_Low()    { GPIO.out_w1tc = ((uint32_t)1 << SPIDEVICE_SCK);  } //digitalWrite(SPIDEVICE_SCK,LOW);  }//PORTB = PORTB & B11011111;  }
+
+const int freq         = 200; //hz
+const int ledChannel   = 0; //channel0
+const int resolution   = 12; //12bit
+const int backLightPin = 2;//digital pin 2
 #else 
     #error Processor not supported
 #endif

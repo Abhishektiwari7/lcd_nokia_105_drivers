@@ -49,17 +49,15 @@ if (LOG) {
 
 display.initDisplay();
 display.PWMinit();
-display.setLcdBrightness(1000); //16 BIT value only
+display.setLcdBrightness(1000); //duty cycle
 display.setDrawPosition(128,160); 
 display.backgroundColor(BLUE);
 display.displayClear();
 }
 
 void loop() {
-//display.setLcdBrightness(analogRead(A2));
+display.setLcdBrightness(analogRead(4));
 displayFunctions(21);
-delay(3000);
-display.displayClear();
 }
 
 void displayFunctions(int test) {
