@@ -37,8 +37,8 @@ const int SID         = 21; //Mosi
 #include "image.h"
 
 #define BAUD_RATE     9600
-//PWM Brightness pin 9: PB1: 15: OC1A
-
+//Arduino uno: PWM Brightness pin 9: PB1: 15: OC1A
+//ESP32: PWM Brightness pin 2
 Nokia105 display( SID,  SCLK, _RESET, _CS);
 
 void setup() {
@@ -59,6 +59,7 @@ display.setLcdBrightness(1000); //16 BIT value only
 void loop() {
 for(int i = 1; i<55;i++){
 displayFunctions(i);
+display.setLcdBrightness(analogRead(4));
 delay(3000);
 display.displayClear();
 }
