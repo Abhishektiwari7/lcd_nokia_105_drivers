@@ -1,5 +1,48 @@
 #ifndef _LCD_H
 #define _LCD_H
+//----------------------Set or Clear of bit-----digitalwrite is very slow----------------------------
+#ifdef ARDUINO_ARCH_AVR
+#define LCD_RES_High()   { PORTB = PORTB | B00010000; /*digitalWrite(SPIDEVICE_RES,HIGH);*/} 
+#define LCD_RES_Low()    { PORTB = PORTB & B11101111; /*digitalWrite(SPIDEVICE_RES,LOW);*/ }
+#define LCD_CS_High()    { PORTB = PORTB | B00010100; /*digitalWrite(SPIDEVICE_CS,HIGH);*/ }  
+#define LCD_CS_Low()     { PORTB = PORTB & B11111011; /*digitalWrite(SPIDEVICE_CS,LOW);*/  }
+#define LCD_SDA_High()   { PORTB = PORTB | B00001000; /*digitalWrite(SPIDEVICE_SDA,HIGH);*/} 
+#define LCD_SDA_Low()    { PORTB = PORTB & B11110111; /*digitalWrite(SPIDEVICE_SDA,LOW);*/ }
+#define LCD_SCK_High()   { PORTB = PORTB | B00100000; /*digitalWrite(SPIDEVICE_SCK,HIGH);*/}
+#define LCD_SCK_Low()    { PORTB = PORTB & B11011111; /*digitalWrite(SPIDEVICE_SCK,LOW);*/ }
+
+/*int portSPIDEVICE_RES = portOutputRegister(digitalPinToPort(SPIDEVICE_RES));
+int portSPIDEVICE_CS =  portOutputRegister(digitalPinToPort(SPIDEVICE_CS));
+int portSPIDEVICE_SDA = portOutputRegister(digitalPinToPort(SPIDEVICE_SDA));
+int portSPIDEVICE_SCK = portOutputRegister(digitalPinToPort(SPIDEVICE_SCK));
+int maskSPIDEVICE_SCK = digitalPinToBitMask(SPIDEVICE_SCK);
+int maskSPIDEVICE_RES = digitalPinToBitMask(SPIDEVICE_RES);
+int maskSPIDEVICE_CS =  digitalPinToBitMask(SPIDEVICE_CS);
+int maskSPIDEVICE_SDA = digitalPinToBitMask(SPIDEVICE_SDA);
+
+#define LCD_RES_High()   { digitalPinToPort(SPIDEVICE_RES) |=   (1<<digitalPinToBitMask(SPIDEVICE_RES));   }//B00010000; }//digitalWrite(SPIDEVICE_RES,HIGH);} 
+#define LCD_RES_Low()    { digitalPinToPort(SPIDEVICE_RES) &=   ~(1<<digitalPinToBitMask(SPIDEVICE_RES));  }//B11101111; }//digitalWrite(SPIDEVICE_RES,LOW); }
+#define LCD_CS_High()    { digitalPinToPort(SPIDEVICE_CS)  |=   (1<<digitalPinToBitMask(SPIDEVICE_CS));    }//B00010100; }//digitalWrite(SPIDEVICE_CS,HIGH); }  
+#define LCD_CS_Low()     { digitalPinToPort(SPIDEVICE_CS)  &=   ~(1<<digitalPinToBitMask(SPIDEVICE_CS));   }//B11111011; }//digitalWrite(SPIDEVICE_CS,LOW);  }
+#define LCD_SDA_High()   { digitalPinToPort(SPIDEVICE_SDA) |=   (1<<digitalPinToBitMask(SPIDEVICE_SDA));   }//B00001000; }//digitalWrite(SPIDEVICE_SDA,HIGH);} 
+#define LCD_SDA_Low()    { digitalPinToPort(SPIDEVICE_SDA) &=   ~(1<<digitalPinToBitMask(SPIDEVICE_SDA));   }//B11110111; }//digitalWrite(SPIDEVICE_SDA,LOW);}
+#define LCD_SCK_High()   { digitalPinToPort(SPIDEVICE_SCK) |=   (1<<digitalPinToBitMask(SPIDEVICE_SCK));   }//B00100000; }//digitalWrite(SPIDEVICE_SCK,HIGH);}
+#define LCD_SCK_Low()    { digitalPinToPort(SPIDEVICE_SCK) &=   ~(1<<digitalPinToBitMask(SPIDEVICE_SCK));  }//B11011111; }//digitalWrite(SPIDEVICE_SCK,LOW); }
+*/
+
+#elif defined ARDUINO_ARCH_ESP32 
+#define LCD_RES_High()   { GPIO.out_w1ts = ((uint32_t)1 << SPIDEVICE_RES);  } //digitalWrite(SPIDEVICE_RES,HIGH);} //PORTB = PORTB | B00010000;}
+#define LCD_RES_Low()    { GPIO.out_w1tc = ((uint32_t)1 << SPIDEVICE_RES);  } //digitalWrite(SPIDEVICE_RES,LOW);  }//PORTB = PORTB & B11101111;  }
+#define LCD_CS_High()    { GPIO.out_w1ts = ((uint32_t)1 << SPIDEVICE_CS);   } //digitalWrite(SPIDEVICE_CS,HIGH); }//PORTB = PORTB | B00010100;}
+#define LCD_CS_Low()     { GPIO.out_w1tc = ((uint32_t)1 << SPIDEVICE_CS);   } //digitalWrite(SPIDEVICE_CS,LOW);   }//PORTB = PORTB & B11111011; }
+#define LCD_SDA_High()   { GPIO.out_w1ts = ((uint32_t)1 << SPIDEVICE_SDA);  } //digitalWrite(SPIDEVICE_SDA,HIGH); }//PORTB = PORTB | B00001000; }
+#define LCD_SDA_Low()    { GPIO.out_w1tc = ((uint32_t)1 << SPIDEVICE_SDA);  } //digitalWrite(SPIDEVICE_SDA,LOW);  }//PORTB = PORTB & B11110111;  }
+#define LCD_SCK_High()   { GPIO.out_w1ts = ((uint32_t)1 << SPIDEVICE_SCK);  } // digitalWrite(SPIDEVICE_SCK,HIGH); }//PORTB = PORTB | B00100000;}
+#define LCD_SCK_Low()    { GPIO.out_w1tc = ((uint32_t)1 << SPIDEVICE_SCK);  } //digitalWrite(SPIDEVICE_SCK,LOW);  }//PORTB = PORTB & B11011111;  }
+#else 
+    #error Processor not supported
+#endif
+
 #include "Arduino.h"
 #include "fonts.h"
  //https://stackoverflow.com/questions/2660484/what-are-0x01-and-0x80-representative-of-in-c-bitwise-operations
@@ -28,18 +71,7 @@
 #define LOG             1              //to activate serial
 #define totalPixals     WIDTH*HEIGHT   //21384
 
-//----------------------Set or Clear of bit-----digitalwrite is very slow----------------------------
-#define LCD_RES_High()   { PORTB = PORTB | B00010000; /*digitalWrite(SPIDEVICE_RES,HIGH);*/} 
-#define LCD_RES_Low()    { PORTB = PORTB & B11101111; /*digitalWrite(SPIDEVICE_RES,LOW);*/ }
-#define LCD_CS_High()    { PORTB = PORTB | B00010100; /*digitalWrite(SPIDEVICE_CS,HIGH);*/ }  
-#define LCD_CS_Low()     { PORTB = PORTB & B11111011; /*digitalWrite(SPIDEVICE_CS,LOW);*/  }
-#define LCD_SDA_High()   { PORTB = PORTB | B00001000; /*digitalWrite(SPIDEVICE_SDA,HIGH);*/} 
-#define LCD_SDA_Low()    { PORTB = PORTB & B11110111; /*digitalWrite(SPIDEVICE_SDA,LOW);*/ }
-#define LCD_SCK_High()   { PORTB = PORTB | B00100000; /*digitalWrite(SPIDEVICE_SCK,HIGH);*/}
-#define LCD_SCK_Low()    { PORTB = PORTB & B11011111; /*digitalWrite(SPIDEVICE_SCK,LOW);*/ }
-
 //----------predefined 16 bit colors
-
 #define BLACK             0x0000
 #define NAVY              0x000F
 #define DARKGREEN         0x03E0
@@ -62,7 +94,7 @@
 
 class Nokia105 {
 	public:
-  Nokia105(int8_t SID, int8_t SCLK, int8_t RST, int8_t CS);
+  Nokia105(int SID, int SCLK, int RST, int CS);
 	/**********************************************************************/
   /*!
     @brief    Pin defination
@@ -217,7 +249,7 @@ class Nokia105 {
   */
   /**********************************************************************/
 	
-	printSingleChar(unsigned char c,unsigned char x, unsigned char y,uint16_t forgroundColor, uint16_t backgroundColor),
+	printSingleChar( unsigned char c,unsigned char x, unsigned char y,uint16_t forgroundColor, uint16_t backgroundColor),
   /**********************************************************************/
   /*!
     @brief    single charatcer only
@@ -225,7 +257,7 @@ class Nokia105 {
   */
   /**********************************************************************/
 	
-	printStringChar (unsigned char *String,unsigned char x,unsigned char y,uint16_t forgroundColor, uint16_t backgroundColor),
+	printStringChar ( char *String,unsigned char x,unsigned char y,uint16_t forgroundColor, uint16_t backgroundColor),
   /**********************************************************************/
   /*!
     @brief    string of data without next line feature
@@ -233,7 +265,7 @@ class Nokia105 {
   */
   /**********************************************************************/
 	
-	printString(uint8_t*str,uint8_t x,uint8_t y,uint16_t forgroundColor, uint16_t backgroundColor),
+	printString(char *str,uint8_t x,uint8_t y,uint16_t forgroundColor, uint16_t backgroundColor),
   /**********************************************************************/
   /*!
     @brief    Print String of character with next line feature
@@ -267,7 +299,7 @@ class Nokia105 {
   /**********************************************************************/
   bool hwSPI; //use gpio or spi interface hardware
 
-  int8_t	SPIDEVICE_CS,
+  int	SPIDEVICE_CS,
           SPIDEVICE_RES,  //miso
           SPIDEVICE_SDA,	//Mosi
           SPIDEVICE_SCK;
