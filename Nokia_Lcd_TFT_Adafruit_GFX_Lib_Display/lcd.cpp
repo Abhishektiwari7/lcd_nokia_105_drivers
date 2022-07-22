@@ -1,3 +1,4 @@
+#include "SPI.h"
 #include "lcd.h"
 #include "fonts.h"
 #include "cmd.h"
@@ -9,12 +10,43 @@ Nokia105::Nokia105(int8_t SDA, int8_t SCLK, int8_t RST, int8_t CS): Adafruit_GFX
   SPIDEVICE_SCK  = SCLK;
   SPIDEVICE_RES   = RST; //misO
   SPIDEVICE_CS = CS;
+
+  #ifdef ARDUINO_ARCH_AVR
+  csPort = portOutputRegister(digitalPinToPort(SPIDEVICE_CS));
+  csPinMask = digitalPinToBitMask(SPIDEVICE_CS);
+  clockPort = portOutputRegister(digitalPinToPort(SPIDEVICE_SCK));
+  clockPinMask = digitalPinToBitMask(SPIDEVICE_SCK);
+  dataPort = portOutputRegister(digitalPinToPort(SPIDEVICE_SDA));
+  dataPinMask = digitalPinToBitMask(SPIDEVICE_SDA);
+  resetPort = portOutputRegister(digitalPinToPort(SPIDEVICE_RES));
+  resetPinMask = digitalPinToBitMask(SPIDEVICE_RES);
+  #elif defined ARDUINO_ARCH_ESP32 
+  //add code here for esp32
+  #else 
+    #error Timer not supported
+  #endif
+
   hwSPI = false;
 }
 
 void Nokia105::writeNokiaCommand (unsigned char Cmd) {
   if (hwSPI) {
-   //hardware spi add
+    #ifdef ARDUINO_ARCH_AVR //still working on using hardware spi
+    *csPort &= ~csPinMask;
+    //command write
+    SPCR = 0; // Disable SPI temporarily
+    *dataPort &= ~dataPinMask; // Clear 9th bit
+    *clockPort |= clockPinMask; // Clock tick
+    *clockPort &= ~clockPinMask; // tock
+    SPCR = spi_save; // Re-enable SPI
+    SPDR = Cmd; // Issue remaining 8 bits
+    while(!(SPSR & _BV(SPIF))); // Await completion
+    *csPort |= csPinMask;
+  #elif defined ARDUINO_ARCH_ESP32 
+  //add here for esp32 
+  #else 
+    #error Timer not supported
+  #endif
   } else {
     uint8_t i,j;
     LCD_SCK_Low();          
@@ -41,7 +73,23 @@ void Nokia105::writeNokiaCommand (unsigned char Cmd) {
 
 void Nokia105:: writeNokiaData (unsigned char Data) {
  if (hwSPI) {
-   //hardware spi add
+  #ifdef ARDUINO_ARCH_AVR //still working on using hardware spi
+    *csPort &= ~csPinMask;
+    //data/cmd transfer here
+    //data write
+    SPCR = 0; // Disable SPI temporarily
+    *dataPort |= dataPinMask; // Set 9th bit
+    *clockPort |= clockPinMask; // Clock tick
+    *clockPort &= ~clockPinMask; // tock
+    SPCR = spi_save; // Re-enable SPI
+    SPDR = Data; // Issue remaining 8 bits
+    while(!(SPSR & _BV(SPIF))); // Await completion
+    *csPort |= csPinMask;
+    #elif defined ARDUINO_ARCH_ESP32 
+    //add code here fpr esp32
+    #else 
+      #error Timer not supported
+    #endif
   } else {
     uint8_t i,j;
     LCD_SCK_Low();          
@@ -63,6 +111,22 @@ void Nokia105:: writeNokiaData (unsigned char Data) {
       j=j>>1;                          
     }
     LCD_CS_High();
+  }
+}
+
+void Nokia105:: hardwareSpiInit(bool hwSPI) {
+if (hwSPI) {
+  #ifdef ARDUINO_ARCH_AVR //still working on using hardware spi
+    SPI.begin();
+    SPI.setClockDivider(SPI_CLOCK_DIV8); // 4 MHz (half speed)
+    SPI.setBitOrder(MSBFIRST);
+    SPI.setDataMode(SPI_MODE0);
+    spi_save = SPCR; // Save SPI config bits for later
+  #elif defined ARDUINO_ARCH_ESP32 
+  //add code here for esp32 
+  #else 
+    #error Timer not supported
+  #endif
   }
 }
 

@@ -1,34 +1,18 @@
 #ifndef _LCD_H
 #define _LCD_H
+#include "Arduino.h"
+#include "fonts.h"
+
 //----------------------Set or Clear of bit-----digitalwrite is very slow----------------------------
 #ifdef ARDUINO_ARCH_AVR
-#define LCD_RES_High()   { PORTB = PORTB | B00010000; /*digitalWrite(SPIDEVICE_RES,HIGH);*/} 
-#define LCD_RES_Low()    { PORTB = PORTB & B11101111; /*digitalWrite(SPIDEVICE_RES,LOW);*/ }
-#define LCD_CS_High()    { PORTB = PORTB | B00010100; /*digitalWrite(SPIDEVICE_CS,HIGH);*/ }  
-#define LCD_CS_Low()     { PORTB = PORTB & B11111011; /*digitalWrite(SPIDEVICE_CS,LOW);*/  }
-#define LCD_SDA_High()   { PORTB = PORTB | B00001000; /*digitalWrite(SPIDEVICE_SDA,HIGH);*/} 
-#define LCD_SDA_Low()    { PORTB = PORTB & B11110111; /*digitalWrite(SPIDEVICE_SDA,LOW);*/ }
-#define LCD_SCK_High()   { PORTB = PORTB | B00100000; /*digitalWrite(SPIDEVICE_SCK,HIGH);*/}
-#define LCD_SCK_Low()    { PORTB = PORTB & B11011111; /*digitalWrite(SPIDEVICE_SCK,LOW);*/ }
-
-/*int portSPIDEVICE_RES = portOutputRegister(digitalPinToPort(SPIDEVICE_RES));
-int portSPIDEVICE_CS =  portOutputRegister(digitalPinToPort(SPIDEVICE_CS));
-int portSPIDEVICE_SDA = portOutputRegister(digitalPinToPort(SPIDEVICE_SDA));
-int portSPIDEVICE_SCK = portOutputRegister(digitalPinToPort(SPIDEVICE_SCK));
-int maskSPIDEVICE_SCK = digitalPinToBitMask(SPIDEVICE_SCK);
-int maskSPIDEVICE_RES = digitalPinToBitMask(SPIDEVICE_RES);
-int maskSPIDEVICE_CS =  digitalPinToBitMask(SPIDEVICE_CS);
-int maskSPIDEVICE_SDA = digitalPinToBitMask(SPIDEVICE_SDA);
-
-#define LCD_RES_High()   { digitalPinToPort(SPIDEVICE_RES) |=   (1<<digitalPinToBitMask(SPIDEVICE_RES));   }//B00010000; }//digitalWrite(SPIDEVICE_RES,HIGH);} 
-#define LCD_RES_Low()    { digitalPinToPort(SPIDEVICE_RES) &=   ~(1<<digitalPinToBitMask(SPIDEVICE_RES));  }//B11101111; }//digitalWrite(SPIDEVICE_RES,LOW); }
-#define LCD_CS_High()    { digitalPinToPort(SPIDEVICE_CS)  |=   (1<<digitalPinToBitMask(SPIDEVICE_CS));    }//B00010100; }//digitalWrite(SPIDEVICE_CS,HIGH); }  
-#define LCD_CS_Low()     { digitalPinToPort(SPIDEVICE_CS)  &=   ~(1<<digitalPinToBitMask(SPIDEVICE_CS));   }//B11111011; }//digitalWrite(SPIDEVICE_CS,LOW);  }
-#define LCD_SDA_High()   { digitalPinToPort(SPIDEVICE_SDA) |=   (1<<digitalPinToBitMask(SPIDEVICE_SDA));   }//B00001000; }//digitalWrite(SPIDEVICE_SDA,HIGH);} 
-#define LCD_SDA_Low()    { digitalPinToPort(SPIDEVICE_SDA) &=   ~(1<<digitalPinToBitMask(SPIDEVICE_SDA));   }//B11110111; }//digitalWrite(SPIDEVICE_SDA,LOW);}
-#define LCD_SCK_High()   { digitalPinToPort(SPIDEVICE_SCK) |=   (1<<digitalPinToBitMask(SPIDEVICE_SCK));   }//B00100000; }//digitalWrite(SPIDEVICE_SCK,HIGH);}
-#define LCD_SCK_Low()    { digitalPinToPort(SPIDEVICE_SCK) &=   ~(1<<digitalPinToBitMask(SPIDEVICE_SCK));  }//B11011111; }//digitalWrite(SPIDEVICE_SCK,LOW); }
-*/
+#define LCD_RES_High()   { *resetPort |=  resetPinMask;  }//PORTB = PORTB | B00010000; /*digitalWrite(SPIDEVICE_RES,HIGH);*/} 
+#define LCD_RES_Low()    { *resetPort &=  ~resetPinMask; }//PORTB = PORTB & B11101111; /*digitalWrite(SPIDEVICE_RES,LOW);*/ }
+#define LCD_CS_High()    { *csPort    |=  csPinMask;     }	//PORTB = PORTB | B00010100; /*digitalWrite(SPIDEVICE_CS,HIGH);*/ }  
+#define LCD_CS_Low()     { *csPort    &=  ~csPinMask;    }//PORTB = PORTB & B11111011; /*digitalWrite(SPIDEVICE_CS,LOW);*/  }
+#define LCD_SDA_High()   { *dataPort  |=  dataPinMask;   } // Set 9th bit//PORTB = PORTB | B00001000; /*digitalWrite(SPIDEVICE_SDA,HIGH);*/} 
+#define LCD_SDA_Low()    { *dataPort  &=  ~dataPinMask;  } // Clear 9th bit//PORTB = PORTB & B11110111; /*digitalWrite(SPIDEVICE_SDA,LOW);*/ }
+#define LCD_SCK_High()   { *clockPort |=  clockPinMask;  } //PORTB = PORTB | B00100000; /*digitalWrite(SPIDEVICE_SCK,HIGH);*/}
+#define LCD_SCK_Low()    { *clockPort &=  ~clockPinMask; }//PORTB = PORTB & B11011111; /*digitalWrite(SPIDEVICE_SCK,LOW);*/ }
 
 #elif defined ARDUINO_ARCH_ESP32 
 #define LCD_RES_High()   { GPIO.out_w1ts = ((uint32_t)1 << SPIDEVICE_RES);  } //digitalWrite(SPIDEVICE_RES,HIGH);} //PORTB = PORTB | B00010000;}
@@ -48,9 +32,7 @@ const int backLightPin = 2;//digital pin 2
     #error Processor not supported
 #endif
 
-#include "Arduino.h"
-#include "fonts.h"
- //https://stackoverflow.com/questions/2660484/what-are-0x01-and-0x80-representative-of-in-c-bitwise-operations
+//https://stackoverflow.com/questions/2660484/what-are-0x01-and-0x80-representative-of-in-c-bitwise-operations
         /*| MSB |     |     |     |     |     |     | LSB |
           |  1  |  0  |  1  |  1  |  0  |  0  |  1  |  1  |   Input
           |  1  |  1  |  0  |  0  |  1  |  1  |  0  |  1  |   Output
@@ -295,18 +277,39 @@ class Nokia105 {
   */
   /**********************************************************************/
 	
-	writeNokiaData(unsigned char c);
+	writeNokiaData(unsigned char c),
   /**********************************************************************/
   /*!
     @brief    write SPI data to nokia display
     @param    
   */
   /**********************************************************************/
+  
+  hardwareSpiInit(bool hwSPI);
+  /**********************************************************************/
+  /*!
+    @brief    write SPI data to nokia display
+    @param    
+  */
+  /**********************************************************************/
+  
   bool hwSPI; //use gpio or spi interface hardware
 
   int	SPIDEVICE_CS,
           SPIDEVICE_RES,  //miso
           SPIDEVICE_SDA,	//Mosi
           SPIDEVICE_SCK;
+  //-----------------------bit bang--------------------------------------
+  volatile uint8_t *csPort,
+                  *resetPort,
+                  *clockPort, 
+                  *dataPort;
+
+  uint8_t csPinMask, 
+          clockPinMask,
+          dataPinMask,
+          resetPinMask;  
+  //------Hardware spi-------
+  uint8_t spi_save;
 };
 #endif
