@@ -8,7 +8,7 @@ i don,t know but i really want this lcd with pcb to play around in electronics p
 ## **SPFD54124B** Driver IC
 ![plot](./Document/LCD_PInout.png)
 
-# **Current Support: Arduino Uno And ESP32 WROOM32 **
+# **Current Support: Arduino Uno And ESP32 WROOM32**
 ## Goals
 -  [ ] hardware spi
 -  [ ] PCB design
