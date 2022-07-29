@@ -11,9 +11,7 @@ i don,t know but i really want this lcd with pcb to play around in electronics p
 # **Current Support: Arduino Uno And ESP32 WROOM32**
 ## Goals
 -  [ ] hardware spi
--  [ ] PCB design
 -  [ ] sd card support
--  [ ] compatibility : esp8266 and stm32
 ## Accompolised
 -  [x] Adafruit_gfx library: Spritegraphics,graphs,circle, rectangle,and triangle
 -  [x] size of a character in option
@@ -21,6 +19,7 @@ i don,t know but i really want this lcd with pcb to play around in electronics p
 -  [x] more information of every     function in detailed
 -  [x] debug function
 -  [x] **esp32** and Arduino UNO(Atmega328p)
+-  [x] PCB design
 
 ## Current Status
--  [ ] PCB design
+-  [ ] compatibility : esp8266 and stm32
