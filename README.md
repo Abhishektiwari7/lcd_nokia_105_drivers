@@ -8,7 +8,7 @@ i don,t know but i really want this lcd with pcb to play around in electronics p
 ## **SPFD54124B** Driver IC
 ![plot](./Document/LCD_PInout.png)
 
-# **Current Support: Arduino Uno And ESP32 WROOM32**
+# **Current Support: Arduino Uno, ESP8266 And ESP32 WROOM32**
 ## Goals
 -  [ ] hardware spi
 -  [ ] sd card support
@@ -19,7 +19,8 @@ i don,t know but i really want this lcd with pcb to play around in electronics p
 -  [x] more information of every     function in detailed
 -  [x] debug function
 -  [x] **esp32** and Arduino UNO(Atmega328p)
--  [x] PCB design
+-  [x] PCB design with - ESP12S,ESP32,and Breadboard Breakout
+-  [x] compatibility : esp8266
 
 ## Current Status
--  [ ] compatibility : esp8266 and stm32
+-  [ ] compatibility stm32
