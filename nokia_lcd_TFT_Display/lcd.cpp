@@ -20,8 +20,10 @@ Nokia105::Nokia105(int SDA, int SCLK, int RST, int CS) {
   resetPinMask = digitalPinToBitMask(SPIDEVICE_RES);
   #elif defined ARDUINO_ARCH_ESP32 
   //add code here for esp32
+  #elif defined ARDUINO_ARCH_ESP8266 
+  //add code here for esp8266
   #else 
-    #error Timer not supported
+    #error Pin not supported
   #endif 
   
   hwSPI = false;
@@ -42,8 +44,10 @@ if (hwSPI) {
     *csPort |= csPinMask;
   #elif defined ARDUINO_ARCH_ESP32 
   //add here for esp32 
+  #elif defined ARDUINO_ARCH_ESP8266 
+  //add code here for esp8266
   #else 
-    #error Timer not supported
+    #error Command not supported
   #endif     
   } else {
     uint8_t i,j;
@@ -85,8 +89,10 @@ void Nokia105:: writeNokiaData (unsigned char Data) {
     *csPort |= csPinMask;
     #elif defined ARDUINO_ARCH_ESP32 
     //add code here fpr esp32
+    #elif defined ARDUINO_ARCH_ESP8266 
+    //add code here for esp8266
     #else 
-      #error Timer not supported
+      #error data not supported
     #endif
   } else {
     uint8_t i,j;
@@ -122,8 +128,10 @@ if (hwSPI) {
     spi_save = SPCR; // Save SPI config bits for later
   #elif defined ARDUINO_ARCH_ESP32 
   //add code here for esp32 
+  #elif defined ARDUINO_ARCH_ESP8266 
+  //add code here for esp8266
   #else 
-    #error Timer not supported
+    #error spi not supported
   #endif
   }
 }
@@ -351,7 +359,7 @@ for( y = HEIGHT; y > 0; y--) {
 
 void Nokia105:: colorPalletTest() {
 int colorPallete[] = {WHITE,BLUE,RED,GREEN,CYAN,MAGENTA,YELLOW,NAVY,DARKGREEN,DARKCYAN,MAROON,PURPLE,OLIVE,LIGHTGREY,DARKGREY,ORANGE,PINK};
-  for(int i=0; i < sizeof(colorPallete); i++) {
+  for(int i=0; i < 10; i++) {
     //Generate complete frame
       for (int y = 0; y < HEIGHT-1; y++) {
       for (int x = 0; x < WIDTH-1; x++) {
@@ -548,6 +556,8 @@ TCCR1A |= 1<<COM1A1;  // Enable Fast PWM on Pin 9: Set OC1A at BOTTOM and clear 
 #elif defined ARDUINO_ARCH_ESP32 
 ledcSetup(ledChannel, freq, resolution);
 ledcAttachPin(backLightPin, ledChannel);
+#elif defined ARDUINO_ARCH_ESP8266 
+//add code here for esp8266
 #else 
   #error Timer not supported
 #endif 
@@ -558,6 +568,8 @@ void Nokia105:: setLcdBrightness(uint16_t PWM) {
 OCR1A = map(PWM, 0, 1023, 0, 65535); //BOTTOM VALUE
 #elif defined ARDUINO_ARCH_ESP32 
 ledcWrite(ledChannel, PWM); //dutycycle 
+#elif defined ARDUINO_ARCH_ESP8266 
+//add code here for esp8266
 #else 
   #error Timer not supported
 #endif 

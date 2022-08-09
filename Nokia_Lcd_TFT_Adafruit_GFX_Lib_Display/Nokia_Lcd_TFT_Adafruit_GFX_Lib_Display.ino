@@ -27,10 +27,14 @@ const int _RESET      = 19;
 const int SCLK        = 23;
 const int SID         = 21; //Mosi
 
+#elif defined ARDUINO_ARCH_ESP8266 
+const int _CS         = 15;          
+const int _RESET      = 16;       
+const int SCLK        = 14;  
+const int SID         = 13; //Mosi
 #else 
     #error Processor not supported
-#endif 
-
+#endif  
 
 #include <Adafruit_GFX.h>
 #include "lcd.h"
@@ -57,7 +61,7 @@ display.setLcdBrightness(1000); //16 BIT value only
 }
 
 void loop() {
-for(int i = 1; i<55;i++){
+for(int i = 1; i<54;i++) {
 displayFunctions(i);
 display.setLcdBrightness(analogRead(4));
 delay(3000);
@@ -287,7 +291,9 @@ void displayFunctions(int test) {
   case 54:
     //code
     break;
-  
+  case 55:
+    //code
+    break;
   case 56:
     //code
     break;

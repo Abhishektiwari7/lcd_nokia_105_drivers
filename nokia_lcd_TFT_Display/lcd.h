@@ -28,6 +28,17 @@ const int freq         = 200; //hz
 const int ledChannel   = 0; //channel0
 const int resolution   = 12; //12bit
 const int backLightPin = 2;//digital pin 2
+
+#elif defined ARDUINO_ARCH_ESP8266 
+#define LCD_RES_High()   {digitalWrite(SPIDEVICE_RES,HIGH);     }
+#define LCD_RES_Low()    {GPOC = ((uint32_t)1 << SPIDEVICE_RES);}// digitalWrite(SPIDEVICE_RES,LOW);}
+#define LCD_CS_High()    {GPOS = ((uint32_t)1 << SPIDEVICE_CS); }//digitalWrite(SPIDEVICE_CS,HIGH); }
+#define LCD_CS_Low()     {GPOC = ((uint32_t)1 << SPIDEVICE_CS); }//digitalWrite(SPIDEVICE_CS,LOW);  }
+#define LCD_SDA_High()   {GPOS = ((uint32_t)1 << SPIDEVICE_SDA);}//digitalWrite(SPIDEVICE_SDA,HIGH);}
+#define LCD_SDA_Low()    {GPOC = ((uint32_t)1 << SPIDEVICE_SDA);}//digitalWrite(SPIDEVICE_SDA,LOW); }
+#define LCD_SCK_High()   {GPOS = ((uint32_t)1 << SPIDEVICE_SCK);}//digitalWrite(SPIDEVICE_SCK,HIGH);}
+#define LCD_SCK_Low()    {GPOC = ((uint32_t)1 << SPIDEVICE_SCK);}//digitalWrite(SPIDEVICE_SCK,LOW); }
+
 #else 
     #error Processor not supported
 #endif

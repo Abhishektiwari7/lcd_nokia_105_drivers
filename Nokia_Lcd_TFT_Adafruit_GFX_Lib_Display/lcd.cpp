@@ -22,9 +22,11 @@ Nokia105::Nokia105(int8_t SDA, int8_t SCLK, int8_t RST, int8_t CS): Adafruit_GFX
   resetPinMask = digitalPinToBitMask(SPIDEVICE_RES);
   #elif defined ARDUINO_ARCH_ESP32 
   //add code here for esp32
+  #elif defined ARDUINO_ARCH_ESP8266 
+  //add code here for esp8266
   #else 
-    #error Timer not supported
-  #endif
+    #error Pin not supported
+  #endif 
 
   hwSPI = false;
 }
@@ -44,9 +46,11 @@ void Nokia105::writeNokiaCommand (unsigned char Cmd) {
     *csPort |= csPinMask;
   #elif defined ARDUINO_ARCH_ESP32 
   //add here for esp32 
+  #elif defined ARDUINO_ARCH_ESP8266 
+  //add code here for esp8266
   #else 
-    #error Timer not supported
-  #endif
+    #error Command not supported
+  #endif  
   } else {
     uint8_t i,j;
     LCD_SCK_Low();          
@@ -87,8 +91,10 @@ void Nokia105:: writeNokiaData (unsigned char Data) {
     *csPort |= csPinMask;
     #elif defined ARDUINO_ARCH_ESP32 
     //add code here fpr esp32
+    #elif defined ARDUINO_ARCH_ESP8266 
+    //add code here for esp8266
     #else 
-      #error Timer not supported
+      #error data not supported
     #endif
   } else {
     uint8_t i,j;
@@ -124,8 +130,10 @@ if (hwSPI) {
     spi_save = SPCR; // Save SPI config bits for later
   #elif defined ARDUINO_ARCH_ESP32 
   //add code here for esp32 
+  #elif defined ARDUINO_ARCH_ESP8266 
+  //add code here for esp8266
   #else 
-    #error Timer not supported
+    #error spi not supported
   #endif
   }
 }
@@ -550,6 +558,8 @@ TCCR1A |= 1<<COM1A1;  // Enable Fast PWM on Pin 9: Set OC1A at BOTTOM and clear 
 #elif defined ARDUINO_ARCH_ESP32 
 ledcSetup(ledChannel, freq, resolution);
 ledcAttachPin(backLightPin, ledChannel);
+#elif defined ARDUINO_ARCH_ESP8266 
+//add code here for esp8266
 #else 
   #error Timer not supported
 #endif 
@@ -560,7 +570,9 @@ void Nokia105:: setLcdBrightness(uint16_t PWM) {
 OCR1A = map(PWM, 0, 1023, 0, 65535); //BOTTOM VALUE
 #elif defined ARDUINO_ARCH_ESP32 
 ledcWrite(ledChannel, PWM); //dutycycle 
+#elif defined ARDUINO_ARCH_ESP8266 
+//add code here for esp8266
 #else 
   #error Timer not supported
-#endif 
+#endif  
 }

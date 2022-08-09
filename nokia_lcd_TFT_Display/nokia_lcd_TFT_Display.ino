@@ -28,10 +28,14 @@ const int _RESET      = 19;
 const int SCLK        = 23;
 const int SID         = 21; //Mosi
 
+#elif defined ARDUINO_ARCH_ESP8266 
+const int _CS         = 15;          
+const int _RESET      = 16;       
+const int SCLK        = 14;  
+const int SID         = 13; //Mosi
 #else 
     #error Processor not supported
 #endif 
-
 
 #include "lcd.h"
 #include "image.h"
@@ -56,8 +60,13 @@ display.displayClear();
 }
 
 void loop() {
+for(int i = 1; i<28;i++) {
+displayFunctions(i);
 display.setLcdBrightness(analogRead(4));
-displayFunctions(21);
+delay(3000);
+display.displayClear();
+}
+//display.printDigit(analogRead(A2),10,10,GREEN,BLACK);
 }
 
 void displayFunctions(int test) {
