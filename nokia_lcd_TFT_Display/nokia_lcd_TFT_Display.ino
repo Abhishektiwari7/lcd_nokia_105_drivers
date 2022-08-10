@@ -66,7 +66,7 @@ display.setLcdBrightness(analogRead(4));
 delay(3000);
 display.displayClear();
 }
-//display.printDigit(analogRead(A2),10,10,GREEN,BLACK);
+//display.printDigit(analogRead(A2),10,10,GREEN,BLACK); 
 }
 
 void displayFunctions(int test) {
@@ -93,11 +93,11 @@ void displayFunctions(int test) {
     break;
   
   case 6:
-//    display.printBitmap(0,0,bitImage,128,64,YELLOW); //x axis, y axis, bit map,bitmap size
+    display.printBitmap(0,0,bitImage,128,100,RED); //x axis, y axis, bit map,bitmap size
     break;
   
   case 7:
-    //display.printBitmap(0,50,myBitmap,128,64,YELLOW); //x axis, y axis, bit map,bitmap size
+    display.printBitmap(0,50,bitImage,128,100,GREEN); //x axis, y axis, bit map,bitmap size
     break;
   
   case 8:
@@ -109,7 +109,7 @@ void displayFunctions(int test) {
     break;
   
   case 10:
-    display.printString("             ",0,10,GREEN,BLACK);
+    display.printString("blank             ",0,10,GREEN,BLACK);
     break;
   
   case 11:
@@ -117,7 +117,7 @@ void displayFunctions(int test) {
     break;
   
   case 12:
-    display.printStringChar("Smile, check 12234567889",2,80,GREEN,BLACK); //only 1 line, no next line like show str
+    display.printStringChar("check no next line",2,80,GREEN,BLACK); //only 1 line, no next line like show str
     break;
   
   case 13:
@@ -157,7 +157,7 @@ void displayFunctions(int test) {
     break;
   
   case 22:
-   // display.image2d ( 120, 80, 0,0, abhishekme ); //working byt need to define array[][y]
+   // display.image2d ( 120, 80, 0,0, abhishekme ); //working by need to define array[][y]
     break;
   
   case 23:

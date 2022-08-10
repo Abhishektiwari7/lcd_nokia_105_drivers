@@ -171,7 +171,22 @@ delay(10);
 writeNokiaCommand(NOKIA105_SPLOUT); //delay,sleep out//0x11
 delay(10);
 writeNokiaCommand(NOKIA105_COLMOD);          //Interface pixel format:bit1,2,3 //0x3a, color mode
-writeNokiaData(0x05);         // 8 bit color
+writeNokiaData(0x05);         // 16 bit color
+//writeNokiaData(0x02);       // 8 bit color
+
+if (RGB2BGR == 0) {
+  writeNokiaCommand(NOKIA105_MADCTL);  //CMD_MADCTR
+  writeNokiaData(0x00);                // RGB
+} else if (RGB2BGR == 1) {
+  writeNokiaCommand(NOKIA105_MADCTL);  //CMD_MADCTR
+  writeNokiaData(0x08);                // BGR
+}
+
+//writeNokiaCommand(NOKIA105_INVON);    // inversion on
+//writeNokiaCommand(NOKIA105_INVOFF);   // inversion off
+//writeNokiaCommand(NOKIA105_GAMSET);   // gamma curve
+//writeNokiaData(0x01);                 // set: 0x01,0x02,0x04,0x08
+
 writeNokiaCommand(NOKIA105_DISPON);          //Display on,0x29=ON,0x28=OFF
 displayClear();
 }
@@ -316,14 +331,14 @@ while(i--) {
 }
 
 void Nokia105:: smpteTest() {
-fillRectangle(0,0,18,128,WHITE); // HEIGHTYPOS, WIDTHXPOS, STARTYPOS, STARTXPOS, ENDY,ENDX
-fillRectangle(18,0,36,128,BLUE); // HEIGHT, WIDTH
-fillRectangle(36,0,54,128,RED); // HEIGHT, WIDTH
-fillRectangle(54,0,72,128,GREEN); // HEIGHT, WIDTH
-fillRectangle(72,0,90,128,CYAN); // HEIGHT, WIDTH
-fillRectangle(90,0,108,128,MAGENTA); // HEIGHT, WIDTH
-fillRectangle(108,0,126,128,YELLOW); // HEIGHT, WIDTH
-fillRectangle(126,0,190,128,BLACK); // HEIGHT, WIDTH
+fillRectangle(0,0,18,160,WHITE); // HEIGHTYPOS, WIDTHXPOS, STARTYPOS, STARTXPOS, ENDY,ENDX
+fillRectangle(18,0,36,160,BLUE); // HEIGHT, WIDTH
+fillRectangle(36,0,54,160,RED); // HEIGHT, WIDTH
+fillRectangle(54,0,72,160,GREEN); // HEIGHT, WIDTH
+fillRectangle(72,0,90,160,CYAN); // HEIGHT, WIDTH
+fillRectangle(90,0,108,160,MAGENTA); // HEIGHT, WIDTH
+fillRectangle(108,0,126,160,YELLOW); // HEIGHT, WIDTH
+fillRectangle(126,0,190,160,BLACK); // HEIGHT, WIDTH
 }
 
 void Nokia105:: printBitmap(int16_t x, int16_t y, const uint8_t bitmap[],int16_t w, int16_t h, uint16_t color) {  
@@ -360,18 +375,17 @@ for( y = HEIGHT; y > 0; y--) {
 void Nokia105:: colorPalletTest() {
 int colorPallete[] = {WHITE,BLUE,RED,GREEN,CYAN,MAGENTA,YELLOW,NAVY,DARKGREEN,DARKCYAN,MAROON,PURPLE,OLIVE,LIGHTGREY,DARKGREY,ORANGE,PINK};
   for(int i=0; i < 10; i++) {
+    backgroundColor(colorPallete[i]);
     //Generate complete frame
-      for (int y = 0; y < HEIGHT-1; y++) {
-      for (int x = 0; x < WIDTH-1; x++) {
-        writeNokiaData(colorPallete[i]>>8); //16 bit color chunks me jaengy
-        writeNokiaData(colorPallete[i]);
-      }
-    }
-    delay(800);
-    displayClear(); //by this no over lapping  
+    //   for (int y = 0; y < HEIGHT-1; y++) {
+    //   for (int x = 0; x < WIDTH-1; x++) {
+    //     writeNokiaData(colorPallete[1]>>8); //16 bit color chunks me jaengy
+    //     writeNokiaData(colorPallete[1]);
+    //   }
+    // }
+    delay(800);  
   }  
 }
-
 
 void Nokia105:: circle(int16_t x0, int16_t y0, int16_t r, uint16_t color) {
 int16_t f = 1 - r;

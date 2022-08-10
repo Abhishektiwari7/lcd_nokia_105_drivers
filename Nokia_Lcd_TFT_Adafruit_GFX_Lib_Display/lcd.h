@@ -69,6 +69,7 @@ const int backLightPin = 2;//digital pin 2
 #define rotateBitmap90  0              //1-> no rotaion 90,0-> yes rorate 90
 #define LOG             1              //to activate serial
 #define totalPixals     WIDTH*HEIGHT   //21384
+#define RGB2BGR         1              //0: RGB,1: BGR, color seems to off.means: blue become red or vice versa. green remain same
 
 //----------predefined 16 bit colors
 #define BLACK             0x0000
