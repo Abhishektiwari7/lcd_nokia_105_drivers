@@ -39,12 +39,6 @@
  spi_device_handle_t spi3;  //spi handler
 //------------------------------------------------------------------adafruit gfx added---------
 Nokia105::Nokia105( uint8_t  SID, uint8_t SCLK, uint8_t  RST, uint8_t CS) {                              //for low memory limitation no gfx
-  
-  // SPIDEVICE_SDA   = SID; //Mosi
-  // SPIDEVICE_SCK   = SCLK;
-  // SPIDEVICE_RES   = RST; 
-  // SPIDEVICE_CS    = CS;
-  // hwSPI = 1;
 if (SID == 0 && SCLK == 0 && RST == 0 && CS == 0 ) {
   SPIDEVICE_SDA   = 23; //Mosi
   SPIDEVICE_SCK   = 18;
@@ -61,72 +55,77 @@ if (SID == 0 && SCLK == 0 && RST == 0 && CS == 0 ) {
 }
 
 void Nokia105::writeNokiaSPI (const char data,const char level) {
-  //ESP_LOGI(TAG, "write nokia SPI.");
-  if ( hwSPI == 0) {
-    //ESP_LOGI(TAG, "//Bitbang// ");
-    LCD_SCK_Low();          
-    LCD_CS_Low();
-      if (level == 'C'|| level == 'c') {              //command 1st bit 0
-        LCD_SDA_Low();
-      } else if (level == 'D'|| level == 'd') {       //command 1st bit 1
-        LCD_SDA_High();
-      } else {
-        ESP_LOGI(TAG, "Invalid SEND spi");
-      }
-    LCD_SCK_High();
-    LCD_SCK_Low();  
-    uint8_t j = 0x80;                         
-    for (uint8_t i = 0; i < 8;i++) {
-      if (data & j) {                                   
-        LCD_SDA_High();   
-        LCD_SCK_High();
-        LCD_SCK_Low();
-      } else {
-        LCD_SDA_Low(); 
-        LCD_SCK_High();
-        LCD_SCK_Low();
-      }
-      j=j>>1;                           
-    }
-    LCD_CS_High();
-  } else if (hwSPI == 1) {
-    /*why not sending comple 16bit color in one go?
-    1st bit for data, necessarry for every 8 bit data, frame like: 1 color 8 bit 1 color 8 bit total 18 bit frame.
-    i can only send : 1 color 16 bit. problem in 16 bit color it need to be seperated by 1 bit data at its 1st place.
-    solution using address kind of technique->set 1st and 9th bit address data as 1. so in between only 16 bit color.
-    t.length = 9 * 2;length in bit
-    2 byte per pixel so Total Data length in bit : 1st bit data/command next 8 bits for data three times because 16bit pixel mode display. 
-    refference pag no.141
-    4 byte data
-    t.tx_data[0] = 8 bit data
-    t.tx_data[1] = 8 bit data
-    t.tx_data[2] = 8 bit data
-    t.tx_data[3] = 8 bit data
-    idea: get 16bit color add 1 bit at 1st and 10th place in 16bit data. then set length 18. 
-    */
-    //ESP_LOGI(TAG, "Hardware Spi");
-    spi_transaction_t t;							//create a spi transaction
-    memset(&t, 0, sizeof(t));						//Zero out of the transaction
-    t.flags = SPI_TRANS_USE_TXDATA;					//Use SPI_TRANS_USE_TXDATA Flag
-    //t.cmd = 0x1;                                  //secret of 9 bit spi
-    t.length = 9;									//length in bit//2 byte per pixel so Total Data length in bit : 1st bit data/command next 8 bits for data three times because 16bit pixel mode display. refference pag no.141
-   
-    if (level == 'C'|| level == 'c') {              //command 1st bit 0
-        t.cmd = 0x0;
-    } else if (level == 'D'|| level == 'd') {       //command 1st bit 1
-        t.cmd = 0x1;
-    } else {
-        ESP_LOGI(TAG, "Invalid SEND spi");
-    }
-
-    t.tx_buffer=(char *)data;                              //Data, remain 8 bit information //void pointer txbuffer
-    esp_err_t ret = spi_device_polling_transmit(spi3, &t);    //Transmit data. local struct copy of spi_transaction -> t copy to spi3
-    assert(ret == ESP_OK);							//Check no issues
-    
-  } else if(hwSPI == 2) {
-    ESP_LOGI(TAG, "Nothing");
+//ESP_LOGI(TAG, "write nokia SPI.");
+if ( hwSPI == 0) {
+  //ESP_LOGI(TAG, "//Bitbang// ");
+  LCD_SCK_Low();          
+  LCD_CS_Low();
+  if (level == 'C'|| level == 'c') {              //command 1st bit 0
+    LCD_SDA_Low();
+  } else if (level == 'D'|| level == 'd') {       //command 1st bit 1
+    LCD_SDA_High();
+  } else {
+    ESP_LOGI(TAG, "Invalid SEND spi");
+    return;
   }
+  LCD_SCK_High();
+  LCD_SCK_Low();  
+  uint8_t j = 0x80;                         
+  for (uint8_t i = 0; i < 8;i++) {
+    if (data & j) {                                   
+      LCD_SDA_High();   
+      LCD_SCK_High();
+      LCD_SCK_Low();
+    } else {
+      LCD_SDA_Low(); 
+      LCD_SCK_High();
+      LCD_SCK_Low();
+    }
+    j=j>>1;                           
+  }
+  LCD_CS_High();
+} else if (hwSPI == 1) {
+  /*why not sending comple 16bit color in one go?
+  1st bit for data, necessarry for every 8 bit data, frame like: 1 color 8 bit 1 color 8 bit total 18 bit frame.
+  i can only send : 1 color 16 bit. problem in 16 bit color it need to be seperated by 1 bit data at its 1st place.
+  solution using address kind of technique->set 1st and 9th bit address data as 1. so in between only 16 bit color.
+  t.length = 9 * 2;length in bit
+  2 byte per pixel so Total Data length in bit : 1st bit data/command next 8 bits for data three times because 16bit pixel mode display. 
+  refference pag no.141
+  4 byte data
+  t.tx_data[0] = 8 bit data
+  t.tx_data[1] = 8 bit data
+  t.tx_data[2] = 8 bit data
+  t.tx_data[3] = 8 bit data
+  idea: get 16bit color add 1 bit at 1st and 10th place in 16bit data. then set length 18. 
+  */
+  //ESP_LOGI(TAG, "Hardware Spi");
+  spi_transaction_t t;							//create a spi transaction
+  memset(&t, 0, sizeof(t));					//Zero out of the transaction
+  t.flags = SPI_TRANS_USE_TXDATA;		//Use SPI_TRANS_USE_TXDATA Flag
+  t.length = 9;									    /*length in bit//2 byte per pixel so Total 
+                                      Data length in bit : 1st bit data/command 
+                                      next 8 bits for data three times because 
+                                      16bit pixel mode display. refference pag no.141 
+                                    */
+  if (level == 'C'|| level == 'c') {        //command 1st bit 0
+      t.cmd = 0x0;
+  } else if (level == 'D'|| level == 'd') { //command 1st bit 1
+      t.cmd = 0x1;
+  } else {
+      ESP_LOGI(TAG, "Invalid SEND spi");
+      return;
+  }
+
+  t.tx_buffer=(char *)data;                               //Data, remain 8 bit information //void pointer txbuffer
+  esp_err_t ret = spi_device_polling_transmit(spi3, &t);  //Transmit data. local struct copy of spi_transaction -> t copy to spi3
+  assert(ret == ESP_OK);							                    //Check no issues
+  
+} else if(hwSPI == 2) {
+  ESP_LOGI(TAG, "Nothing");
 }
+}
+//---------------------------working on reading device id--------------------------------------
 // uint32_t lcd_get_id( ) {
 //     //get_id cmd
 //     //lcd_cmd(spi, 0x04);
@@ -157,14 +156,6 @@ if (hwSPI == 0) {
 } else if (hwSPI == 1) {
     esp_err_t ret;
     ESP_LOGI(TAG, "Initializing bus SPI %d...", SPI3_HOST);    
-    /*spi_bus_config_t buscfg = { //works in c
-      .miso_io_num = -1,
-      .mosi_io_num = SPIDEVICE_SDA,
-      .sclk_io_num = SPIDEVICE_SCK,
-      .quadwp_io_num = -1,
-      .quadhd_io_num = -1,
-      .max_transfer_sz = 2*128*160,
-    };*/
 
     spi_bus_config_t buscfg;
     memset(&buscfg, 0, sizeof(spi_bus_config_t));
@@ -203,19 +194,19 @@ if (hwSPI == 0) {
 }
 
 void Nokia105:: displayClear(void) {
-writeNokiaSPI(NOKIA105_CASET,c);//writeNokiaSPI(NOKIA105_CASET); // x-addres 0 to 0x83 //Ox2a
-writeNokiaSPI(NOKIA105_NOP,d);//writeNokiaSPI(NOKIA105_NOP);      // xsta:BIT0-7 //0x00
-writeNokiaSPI(NOKIA105_NOP,d);//writeNokiaSPI(NOKIA105_NOP);      // xend:BIT0-7
-writeNokiaSPI(NOKIA105_NOP,d);//writeNokiaSPI(NOKIA105_NOP);      // xsta:BIT0-7
-writeNokiaSPI(0x83,d);        //writeNokiaSPI(0x83); dec:131              // xend:BIT0-7
+writeNokiaSPI(NOKIA105_CASET,c);        // x-addres 0 to 0x83 //Ox2a
+writeNokiaSPI(NOKIA105_NOP,d);          // xsta:BIT0-7 //0x00
+writeNokiaSPI(NOKIA105_NOP,d);          // xend:BIT0-7
+writeNokiaSPI(NOKIA105_NOP,d);          // xsta:BIT0-7
+writeNokiaSPI(0x83,d);                  // xend:BIT0-7 //dec:131
 
-writeNokiaSPI(NOKIA105_PASET,c);//writeNokiaSPI(NOKIA105_PASET); // y-address 0 to 0xa1 //0x2b
-writeNokiaSPI(NOKIA105_NOP,d);//writeNokiaSPI(NOKIA105_NOP);      // Ysta:BIT0-7
-writeNokiaSPI(NOKIA105_NOP,d);//writeNokiaSPI(NOKIA105_NOP);      // xend:BIT0-7
-writeNokiaSPI(NOKIA105_NOP,d);//writeNokiaSPI(NOKIA105_NOP);      // xsta:BIT0-7
-writeNokiaSPI(0xa1,d);        //writeNokiaSPI(0xa1);    dec:161          // xend:BIT0-7
+writeNokiaSPI(NOKIA105_PASET,c);        // y-address 0 to 0xa1 //0x2b
+writeNokiaSPI(NOKIA105_NOP,d);          // Ysta:BIT0-7
+writeNokiaSPI(NOKIA105_NOP,d);          // xend:BIT0-7
+writeNokiaSPI(NOKIA105_NOP,d);          // xsta:BIT0-7
+writeNokiaSPI(0xa1,d);                  // xend:BIT0-7 //dec:161 
 
-writeNokiaSPI(NOKIA105_RAMWR,c);//writeNokiaSPI(NOKIA105_RAMWR); // RAMWR //0x2c
+writeNokiaSPI(NOKIA105_RAMWR,c);        // RAMWR //0x2c
 
 for (unsigned int i = 0; i < totalPixals; i++) {
   writeNokiaSPI(NOKIA105_NOP,d);
@@ -234,26 +225,26 @@ vTaskDelay(10 / portTICK_PERIOD_MS);
 LCD_RES_High();
 vTaskDelay(10 / portTICK_PERIOD_MS);
     
-writeNokiaSPI(NOKIA105_SPLOUT,c);//writeNokiaSPI(NOKIA105_SPLOUT); // vTaskDelay,sleep out//0x11    
+writeNokiaSPI(NOKIA105_SPLOUT,c);    // vTaskDelay,sleep out//0x11    
 vTaskDelay(10 / portTICK_PERIOD_MS);
 
-writeNokiaSPI(NOKIA105_COLMOD,c);//writeNokiaSPI(NOKIA105_COLMOD); // Interface pixel format:bit1,2,3 //0x3a, color mode
-writeNokiaSPI(0x05,d);//writeNokiaSPI(0x05);               // 16 bit color
-//writeNokiaSPI(0x02,d) //writeNokiaSPI(0x02);       // 8 bit color
+writeNokiaSPI(NOKIA105_COLMOD,c);    // Interface pixel format:bit1,2,3 //0x3a, color mode
+writeNokiaSPI(0x05,d);               // 16 bit color
+//writeNokiaSPI(0x02,d);             // 8 bit color
 
 if (RGB2BGR == 0) {
-  writeNokiaSPI(NOKIA105_MADCTL,c);//writeNokiaSPI(NOKIA105_MADCTL); // CMD_MADCTR
-  writeNokiaSPI(0x00,d);//writeNokiaSPI(0x00);               // RGB
+  writeNokiaSPI(NOKIA105_MADCTL,c); // CMD_MADCTR
+  writeNokiaSPI(0x00,d);               // RGB
 }
 else if (RGB2BGR == 1) {
-  writeNokiaSPI(NOKIA105_MADCTL,c);//writeNokiaSPI(NOKIA105_MADCTL); // CMD_MADCTR
-  writeNokiaSPI(0x08,d);//writeNokiaSPI(0x08);               // BGR
+  writeNokiaSPI(NOKIA105_MADCTL,c); // CMD_MADCTR
+  writeNokiaSPI(0x08,d);               // BGR
 }
 // writeNokiaSPI(NOKIA105_INVON,c);    // inversion on
 // writeNokiaSPI(NOKIA105_INVOFF,c);   // inversion off
 // writeNokiaSPI(NOKIA105_GAMSET,c);   // gamma curve
 // writeNokiaSPI(0x01,d);              // set: 0x01,0x02,0x04,0x08
-writeNokiaSPI(NOKIA105_DISPON,c);      //writeNokiaSPI(NOKIA105_DISPON); // Display on,0x29=ON,0x28=OFF
+writeNokiaSPI(NOKIA105_DISPON,c);      // Display on,0x29=ON,0x28=OFF
 displayClear();
 }
 
@@ -333,7 +324,7 @@ void Nokia105:: image1d (uint16_t w, uint16_t h, uint16_t shiftX,uint16_t shiftY
 int l = 0;
 for (int y = 0; y < h; y++) { //h
   for (int x = 0; x < w; x++) { //w
-    //drawPixel( x+shiftX, y+shiftY, pgm_read_word(&(image[l]))); //research
+    drawPixel( x+shiftX, y+shiftY, pgm_read_word(&(image[l]))); //research
     l++;
     }
   }
@@ -418,7 +409,7 @@ for (int16_t j = 0; j < h; j++, y++) {
     if (i & 7)
       byte <<= 1;
     else
-      //byte = pgm_read_byte(&bitmap[j * byteWidth + i / 8]); //research required
+      byte = pgm_read_byte(&bitmap[j * byteWidth + i / 8]); //research required
     if (byte & 0x80) {
         drawPixel(x + i, y, color);
     }

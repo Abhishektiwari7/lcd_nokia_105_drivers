@@ -23,6 +23,18 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  **************************************************************************/
 #pragma once
+
+#ifndef pgm_read_byte
+#define pgm_read_byte(addr) (*(const unsigned char *)(addr))
+#endif
+
+#ifndef pgm_read_word
+#define pgm_read_word(addr) (*(const unsigned short *)(addr))
+#endif
+
+#ifndef pgm_read_dword
+#define pgm_read_dword(addr) (*(const unsigned long *)(addr))
+#endif
 //----------------------Set or Clear of bit-----digitalwrite is very slow----------------------------
 #define LCD_RES_High()   { gpio_set_level((gpio_num_t)SPIDEVICE_RES, 1); }
 #define LCD_RES_Low()    { gpio_set_level((gpio_num_t)SPIDEVICE_RES, 0); }
