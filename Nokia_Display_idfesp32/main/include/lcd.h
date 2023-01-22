@@ -44,7 +44,17 @@
 #define LCD_SDA_Low()    { gpio_set_level((gpio_num_t)SPIDEVICE_SDA,0);  } 
 #define LCD_SCK_High()   { gpio_set_level((gpio_num_t)SPIDEVICE_SCK,1);  } 
 #define LCD_SCK_Low()    { gpio_set_level((gpio_num_t)SPIDEVICE_SCK,0);  }
-const int BACK_LIGHT = 2;
+
+//---------------------------PWM----------------------------------------------------------------------
+const int BACK_LIGHT = 4;
+
+// // Set the LEDC peripheral configuration
+#define LEDC_TIMER              LEDC_TIMER_0
+#define LEDC_MODE               LEDC_HIGH_SPEED_MODE
+#define LEDC_OUTPUT_IO          BACK_LIGHT         // Define the output GPIO
+#define LEDC_CHANNEL            LEDC_CHANNEL_0
+#define LEDC_DUTY_RES           LEDC_TIMER_9_BIT  //LEDC_TIMER_13_BIT //for 5khz Set duty resolution to 13 bits
+#define LEDC_FREQUENCY          (100000)          //(5000) // Frequency in Hertz. Set frequency at 5 kHz
 
 //----------------------------macros to Manipulate display-----------------------------------
 #define WIDTH          130
@@ -108,7 +118,7 @@ class Nokia105 final {
   */
   /**********************************************************************/
 
-  setLcdBrightness(uint16_t PWM),    
+  setLcdBrightness(unsigned int PWM),    
   /**********************************************************************/
   /*!
     @brief    simple map the input 16 bit values to counter

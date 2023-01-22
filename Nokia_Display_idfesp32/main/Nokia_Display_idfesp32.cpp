@@ -177,7 +177,7 @@ extern "C" void app_main(void) {
 
 display.initDisplay();
 display.PWMinit();
-display.setLcdBrightness(1000); //duty cycle
+display.setLcdBrightness(100);   //max 512, duty cycle
 display.setDrawPosition(128,160);
 display.backgroundColor(BLUE);
 display.displayClear();

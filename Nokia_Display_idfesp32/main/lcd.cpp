@@ -33,6 +33,8 @@
 #include "driver/gpio.h"
 
 #include "driver/spi_master.h"
+#include "driver/ledc.h"
+#include "esp_err.h"
 #include "lcd.h"
 #include "fonts.h"
 #include "cmd.h"
@@ -599,10 +601,32 @@ while(*str!=0) {
 } 
 
 void Nokia105:: PWMinit() {
-gpio_reset_pin((gpio_num_t)BACK_LIGHT);
-gpio_set_direction((gpio_num_t)BACK_LIGHT, GPIO_MODE_OUTPUT);
-gpio_set_level((gpio_num_t)BACK_LIGHT, 1); //backlight
+//gpio_reset_pin((gpio_num_t)BACK_LIGHT);
+//gpio_set_direction((gpio_num_t)BACK_LIGHT, GPIO_MODE_OUTPUT);
+//gpio_set_level((gpio_num_t)BACK_LIGHT, 1); //backlight
+ledc_timer.speed_mode       = LEDC_MODE;
+ledc_timer.timer_num        = LEDC_TIMER;
+ledc_timer.duty_resolution  = LEDC_DUTY_RES;
+ledc_timer.freq_hz          = LEDC_FREQUENCY;  // Set output frequency at ? kHz
+ledc_timer.clk_cfg          = LEDC_AUTO_CLK;
+ESP_ERROR_CHECK(ledc_timer_config(&ledc_timer));
+
+ledc_channel.speed_mode     = LEDC_MODE;
+ledc_channel.channel        = LEDC_CHANNEL;
+ledc_channel.timer_sel      = LEDC_TIMER;
+ledc_channel.intr_type      = LEDC_INTR_DISABLE;
+ledc_channel.gpio_num       = LEDC_OUTPUT_IO;
+ledc_channel.duty           = 0; // Set duty to 0%
+ledc_channel.hpoint         = 0;
+ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel));
 }
 
-void Nokia105:: setLcdBrightness(uint16_t PWM) {
+void Nokia105:: setLcdBrightness(unsigned int PWM) {
+  if (PWM > 512) {
+     PWM = 512; //max
+   } else if (PWM < 20 ) {
+      PWM = 20;  //min
+   }
+    ESP_ERROR_CHECK(ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, PWM));
+    ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL));
 }
