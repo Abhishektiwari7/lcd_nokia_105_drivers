@@ -38,7 +38,9 @@
 #include "lcd.h"
 #include "fonts.h"
 #include "cmd.h"
- spi_device_handle_t spi3;  //spi handler
+spi_device_handle_t spi3;  //spi handler
+ledc_timer_config_t ledc_timer; //ledc pwm
+ledc_channel_config_t ledc_channel; //ledc pwm
 //------------------------------------------------------------------adafruit gfx added---------
 Nokia105::Nokia105( uint8_t  SID, uint8_t SCLK, uint8_t  RST, uint8_t CS) {                              //for low memory limitation no gfx
 if (SID == 0 && SCLK == 0 && RST == 0 && CS == 0 ) {
