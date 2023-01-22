@@ -59,113 +59,113 @@
 Nokia105 display( 0, 0, 0, 0);
 void displayFunctions(int test) {
   switch (test) {
-  
+
   case 1:
     display.colorPalletTest();
     break;
-  
+
   case 2:
     display.smpteTest();
     break;
-  
+
   case 3:
     display.fillRectangle(0,0,18,128,WHITE);   // HEIGHTYPOS, WIDTHXPOS, STARTYPOS, STARTXPOS, ENDY,ENDX
     break;
-  
+
   case 4:
     display.printString("abhishek tiwari",0,50,RED,YELLOW);  //charactare, horizontal position, vertical position
     break;
-  
+
   case 5:
     display.printString("0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz123456789abcdefghijklmnop",0,2,PURPLE,BLACK);
     break;
-  
+
   case 6:
     display.printBitmap(0,0,bitImage,128,100,RED); //x axis, y axis, bit map,bitmap size
     break;
-  
+
   case 7:
     display.printBitmap(0,50,bitImage,128,100,GREEN); //x axis, y axis, bit map,bitmap size
     break;
-  
+
   case 8:
     display.printString("! @ # $ % ^ & *  () _ - + = < > ,",0,2,GREEN,BLACK);
     break;
-  
+
   case 9:
     display.printString("",0,2,GREEN,BLACK);
     break;
-  
+
   case 10:
     display.printString("blank             ",0,10,GREEN,BLACK);
     break;
-  
+
   case 11:
     display.printString("/{}[]",0,20,GREEN,BLACK);
     break;
-  
+
   case 12:
     display.printStringChar("check no next line",2,80,GREEN,BLACK); //only 1 line, no next line like show str
     break;
-  
+
   case 13:
     display.printSingleChar ('1',80,50,GREEN,BLACK);
     break;
-  
+
   case 14:
     display.printSingleChar ('2',32,50,GREEN,BLACK);
     break;
-  
+
   case 15:
     display.printSingleChar ('3',80,90,GREEN,BLACK);
     break;
-  
+
   case 16:
     display.printSingleChar ('4',32,90,GREEN,BLACK);
     break;
-  
+
   case 17:
     display.lineHorixontal(10,80,100,WHITE);     //VERTICAL,HORIZONTAL, LENGTH
     break;
-  
+
   case 18:
     display.lineVertical(10,80,100,GREEN);      //PEHLA -- UPER LE JATA HAIN,DUSRA ++ ULTEY HATH KE TARAF LATA HAIN,
     break;
-  
+
   case 19:
     display.drawPixel(100,100,RED);
     break;
-  
+
   case 20:
-    display.displayClear();
-    break;
-  
-  case 21:
-   //display.image1d ( 125, 110, 0,0, ram );
-    break;
-  
-  case 22:
-   // display.image2d ( 120, 80, 0,0, abhishekme ); //working by need to define array[][y]
-    break;
-  
-  case 23:
-   //display.image1d ( 125, 110, 0,0, abhishek );
-    break;
-  
-  case 24:
-   // display.drawtext('8',50,50,BLUE);
-    break;
-  
-  case 25:
     display.circle(64, 83, 50, YELLOW);
     break;
-  
-  case 26:
-    display.printDigit(100,10,10,GREEN,BLACK);
+
+  case 21:
+   display.image1d ( 125, 110, 0,0, ram );
     break;
-  
+
+  case 22:
+   display.printString("a",0,2,GREEN,BLACK);
+    break;
+
+  case 23:
+   display.image1d ( 125, 110, 0,0, abhishek );
+    break;
+
+  case 24:
+   display.printDigit(100,10,10,GREEN,BLACK);
+    break;
+
+  case 25:
+    display.displayClear();
+    break;
+
+  case 26:
+    // display.drawtext('8',50,50,BLUE);
+    break;
+
   case 27:
-    display.printString("a",0,2,GREEN,BLACK);
+    // display.image2d ( 120, 80, 0,0, abhishekme ); //working by need to define array[][y]
     break;
 
   default:
@@ -174,14 +174,14 @@ void displayFunctions(int test) {
   }
 }
 extern "C" void app_main(void) {
-    
+
 display.initDisplay();
 display.PWMinit();
 display.setLcdBrightness(1000); //duty cycle
-display.setDrawPosition(128,160); 
+display.setDrawPosition(128,160);
 display.backgroundColor(BLUE);
 display.displayClear();
-ESP_LOGI(TAG, "APP main - Display Setup Completed, Functions are Activated");    
+ESP_LOGI(TAG, "APP main - Display Setup Completed, Functions are Activated");
  while (1) {
     for(int i = 1; i < 28; i++) {
     displayFunctions(i);
@@ -190,12 +190,12 @@ ESP_LOGI(TAG, "APP main - Display Setup Completed, Functions are Activated");
    }
     //display.setLcdBrightness(analogRead(4));
    // display.printDigit(analogRead(A2),10,10,GREEN,BLACK);
- }   
+ }
 }
 
 
  /* IMPORTANT LINK:
-  1.https://forum.arduino.cc/t/nokia-c1-1616-display/931571/8 
+  1.https://forum.arduino.cc/t/nokia-c1-1616-display/931571/8
   2.https://github.com/fire0shadow/Adafruit-SPFD54124B
   3.http://uglyduck.vajn.icu/PDF/lcd/Nokia1202/Nokia_1202_LCD.html
   4.https://github.com/fire0shadow/Adafruit-SPFD54124B/blob/master/examples/SPFD54124B.ino
