@@ -64,6 +64,7 @@ if ( hwSPI == 0) {
   //ESP_LOGI(TAG, "//Bitbang// ");
   LCD_SCK_Low();          
   LCD_CS_Low();
+  //----------------high 8 bit data----------------------------
   if (level == 'C'|| level == 'c') {              //command 1st bit 0
     LCD_SDA_Low();
   } else if (level == 'D'|| level == 'd') {       //command 1st bit 1
@@ -89,45 +90,56 @@ if ( hwSPI == 0) {
   }
   LCD_CS_High();
 } else if (hwSPI == 1) {
-  /*why not sending comple 16bit color in one go?
-  1st bit for data, necessarry for every 8 bit data, frame like: 1 color 8 bit 1 color 8 bit total 18 bit frame.
-  i can only send : 1 color 16 bit. problem in 16 bit color it need to be seperated by 1 bit data at its 1st place.
-  solution using address kind of technique->set 1st and 9th bit address data as 1. so in between only 16 bit color.
-  t.length = 9 * 2;length in bit
-  2 byte per pixel so Total Data length in bit : 1st bit data/command next 8 bits for data three times because 16bit pixel mode display. 
-  refference pag no.141
-  4 byte data
-  t.tx_data[0] = 8 bit data
-  t.tx_data[1] = 8 bit data
-  t.tx_data[2] = 8 bit data
-  t.tx_data[3] = 8 bit data
-  idea: get 16bit color add 1 bit at 1st and 10th place in 16bit data. then set length 18. 
-  */
-  //ESP_LOGI(TAG, "Hardware Spi");
-  spi_transaction_t t;							//create a spi transaction
-  memset(&t, 0, sizeof(t));					//Zero out of the transaction
-  t.flags = SPI_TRANS_USE_TXDATA;		//Use SPI_TRANS_USE_TXDATA Flag
-  t.length = 9;									    /*length in bit//2 byte per pixel so Total 
-                                      Data length in bit : 1st bit data/command 
-                                      next 8 bits for data three times because 
-                                      16bit pixel mode display. refference pag no.141 
-                                    */
-  if (level == 'C'|| level == 'c') {        //command 1st bit 0
-      t.cmd = 0x0;
-  } else if (level == 'D'|| level == 'd') { //command 1st bit 1
-      t.cmd = 0x1;
-  } else {
-      ESP_LOGI(TAG, "Invalid SEND spi");
-      return;
-  }
+    /*why not sending comple 16bit color in one go?
+    1st bit for data, necessarry for every 8 bit data, frame like: 1 color 8 bit 1 color 8 bit total 18 bit frame.
+    i can only send : 1 color 16 bit. problem in 16 bit color it need to be seperated by 1 bit data at its 1st place.
+    solution using address kind of technique->set 1st and 9th bit address data as 1. so in between only 16 bit color.
+    t.length = 9 * 2;length in bit
+    2 byte per pixel so Total Data length in bit : 1st bit data/command next 8 bits for data three times because 16bit pixel mode display. 
+    refference pag no.141
+    4 byte data
+    t.tx_data[0] = 8 bit data
+    t.tx_data[1] = 8 bit data
+    t.tx_data[2] = 8 bit data
+    t.tx_data[3] = 8 bit data
+    idea: get 16bit color add 1 bit at 1st and 10th place in 16bit data. then set length 18. 
+      SPI_SWAP_DATA_TX(0x145, 9); test me //https://1-rt--net-jp.translate.goog/mobility/archives/7026?_x_tr_enc=1&_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en-GB
+      But be more careful when sending 16 bit (or 32 bit) data.
+      ESP32 is designed in [little endian] . For example, when 16-bit data 0xABCD is stored in the transmission buffer, it is stored in the order of CD AB in memory .
+      Therefore, even if you intended to send 0xABCD, it is actually sent in the order of CDAB .
+      As a countermeasure, the [ SPI_SWAP_DATA_TX] and [ SPI_SWAP_DATA_RX] macros are provided to convert the data order.
 
-  t.tx_buffer=(char *)data;                               //Data, remain 8 bit information //void pointer txbuffer
-  esp_err_t ret = spi_device_polling_transmit(spi3, &t);  //Transmit data. local struct copy of spi_transaction -> t copy to spi3
-  assert(ret == ESP_OK);							                    //Check no issues
+      queue application https://github.com/espressif/esp-idf/blob/master/examples/peripherals/spi_master/lcd/main/spi_master_example_main.c
+    */
+    //ESP_LOGI(TAG, "Hardware Spi");
+    spi_device_acquire_bus(spi3, portMAX_DELAY);  // When using SPI_TRANS_CS_KEEP_ACTIVE, bus must be locked/acquired
+
+    spi_transaction_t t;							//create a spi transaction
+    memset(&t, 0, sizeof(t));					//Zero out of the transaction
+    t.flags = SPI_TRANS_USE_TXDATA;		//Use SPI_TRANS_USE_TXDATA Flag
+    t.length = 9;									    /*length in bit//2 byte per pixel so Total 
+                                        Data length in bit : 1st bit data/command 
+                                        next 8 bits for data three times because 
+                                        16bit pixel mode display. refference pag no.141 
+                                      */
+    if (level == 'C'|| level == 'c') {        //command 1st bit 0
+        t.cmd = 0x0;
+    } else if (level == 'D'|| level == 'd') { //command 1st bit 1
+        t.cmd = 0x1;
+    } else {
+        ESP_LOGI(TAG, "Invalid SEND spi");
+        return;
+    }
+
+    t.tx_buffer=(char *)data;                               //Data, remain 8 bit information //void pointer txbuffer
+    esp_err_t ret = spi_device_polling_transmit(spi3, &t);  //Transmit data. local struct copy of spi_transaction -> t copy to spi3
+    //esp_err_t ret =spi_device_queue_trans(spi3, &t, 0); //slow
+    assert(ret == ESP_OK);							                    //Check no issues
   
-} else if(hwSPI == 2) {
-  ESP_LOGI(TAG, "Nothing");
-}
+    spi_device_release_bus(spi3); // Release bus
+  } else if(hwSPI == 2) {
+    ESP_LOGI(TAG, "Nothing");
+  }
 }
 //---------------------------working on reading device id--------------------------------------
 // uint32_t lcd_get_id( ) {
@@ -168,7 +180,15 @@ if (hwSPI == 0) {
     buscfg.miso_io_num = -1;
     buscfg.quadwp_io_num = -1; // Not used
     buscfg.quadhd_io_num = -1; // Not used
-    buscfg.max_transfer_sz = 2*128*160;
+    buscfg.max_transfer_sz = 2*totalPixals;
+    
+    ret = spi_bus_initialize(SPI3_HOST, &buscfg, 0); 
+    /*SPI_DMA_CH1      = 1,     ///< Enable DMA, select DMA Channel 1
+      SPI_DMA_CH2      = 2,     ///< Enable DMA, select DMA Channel 2
+      SPI_DMA_CH_AUTO  = 3,     ///< Enable DMA, channel is automatically selected by driver
+    */
+    ESP_ERROR_CHECK(ret);
+    
     spi_device_interface_config_t devcfg = {
       .command_bits = 1,                     //1st bit number of bits , 9bit secret power
       //.address_bits = 0,
@@ -183,12 +203,7 @@ if (hwSPI == 0) {
       .post_cb = NULL,                       //after transaction
     };	
 
-    ret = spi_bus_initialize(SPI3_HOST, &buscfg, 3); 
-    /*SPI_DMA_CH1      = 1,     ///< Enable DMA, select DMA Channel 1
-      SPI_DMA_CH2      = 2,     ///< Enable DMA, select DMA Channel 2
-      SPI_DMA_CH_AUTO  = 3,     ///< Enable DMA, channel is automatically selected by driver
-    */
-    ESP_ERROR_CHECK(ret);
+    
     //ESP_LOGI(TAG, "Api bus intial");
     ESP_ERROR_CHECK(spi_bus_add_device(SPI3_HOST, &devcfg, &spi3)); //spi3 added in config to able to use spi
     //ESP_LOGI(TAG, "Spi bus add device");
