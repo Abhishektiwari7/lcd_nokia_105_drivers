@@ -35,15 +35,10 @@
 #ifndef pgm_read_dword
 #define pgm_read_dword(addr) (*(const unsigned long *)(addr))
 #endif
+
 //----------------------Set or Clear of bit-----digitalwrite is very slow----------------------------
 #define LCD_RES_High()   { gpio_set_level((gpio_num_t)SPIDEVICE_RES, 1); }
 #define LCD_RES_Low()    { gpio_set_level((gpio_num_t)SPIDEVICE_RES, 0); }
-#define LCD_CS_High()    { gpio_set_level((gpio_num_t)SPIDEVICE_CS, 1);  } 
-#define LCD_CS_Low()     { gpio_set_level((gpio_num_t)SPIDEVICE_CS, 0);  } 
-#define LCD_SDA_High()   { gpio_set_level((gpio_num_t)SPIDEVICE_SDA,1);  } 
-#define LCD_SDA_Low()    { gpio_set_level((gpio_num_t)SPIDEVICE_SDA,0);  } 
-#define LCD_SCK_High()   { gpio_set_level((gpio_num_t)SPIDEVICE_SCK,1);  } 
-#define LCD_SCK_Low()    { gpio_set_level((gpio_num_t)SPIDEVICE_SCK,0);  }
 
 //---------------------------PWM----------------------------------------------------------------------
 const int BACK_LIGHT = 4;
@@ -281,7 +276,8 @@ class Nokia105 final {
   */
   /**********************************************************************/
 
-	private:
+	
+  private:
   void	writeNokiaSPI(const char data,const char level),
   /**********************************************************************/
   /*!
@@ -290,7 +286,7 @@ class Nokia105 final {
   */
   /**********************************************************************/
   
-  hardwareSpiInit(uint8_t hwSPI);
+  hardwareSpiInit();
   /**********************************************************************/
   /*!
     @brief    write SPI data to nokia display
