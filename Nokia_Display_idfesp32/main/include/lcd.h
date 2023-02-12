@@ -140,15 +140,17 @@ class Nokia105 final {
   /**********************************************************************/
   
   drawPixel(int16_t x, int16_t y, uint16_t color), 
-	/**********************************************************************/
+	pushFastPixel(uint32_t length, const void* color),
+  /**********************************************************************/
   /*!
     @brief    as function name says, it drae 1 pixel on screen
     @param    x: horizonal position, y: vertical position,color: 16 bit color in hex
     only drawPixel added along with lcd.cpp->height and width
+              length : total number of pixel being send.
   */
   /**********************************************************************/
 	
-	image1d (uint16_t w, uint16_t h, uint16_t shiftX,uint16_t shiftY, const uint16_t image[] ),
+	image1d (uint16_t w, uint16_t h, uint16_t shiftX,uint16_t shiftY, const uint16_t * image ),
 	/**********************************************************************/
   /*!
     @brief    Pin defination

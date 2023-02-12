@@ -217,20 +217,7 @@ spiInit(SPIDEVICE_SDA, SPIDEVICE_SCK, SPIDEVICE_CS,hwSPI);
 }
 
 void Nokia105:: displayClear(void) {
-writeNokiaSPI(NOKIA105_CASET,c);        // x-addres 0 to 0x83 //Ox2a
-writeNokiaSPI(NOKIA105_NOP,d);          // xsta:BIT0-7 //0x00
-writeNokiaSPI(NOKIA105_NOP,d);          // xend:BIT0-7
-writeNokiaSPI(NOKIA105_NOP,d);          // xsta:BIT0-7
-writeNokiaSPI(0x83,d);                  // xend:BIT0-7 //dec:131
-
-writeNokiaSPI(NOKIA105_PASET,c);        // y-address 0 to 0xa1 //0x2b
-writeNokiaSPI(NOKIA105_NOP,d);          // Ysta:BIT0-7
-writeNokiaSPI(NOKIA105_NOP,d);          // xend:BIT0-7
-writeNokiaSPI(NOKIA105_NOP,d);          // xsta:BIT0-7
-writeNokiaSPI(0xa1,d);                  // xend:BIT0-7 //dec:161 
-
-writeNokiaSPI(NOKIA105_RAMWR,c);        // RAMWR //0x2c
-
+setDrawPosition(0,0);
 for (unsigned int i = 0; i < totalPixals; i++) {
   writeNokiaSPI(NOKIA105_NOP,d);
   writeNokiaSPI(NOKIA105_NOP,d);
@@ -277,15 +264,15 @@ displayClear();
 void Nokia105:: setDrawPosition(unsigned char x, unsigned char y) {
 writeNokiaSPI(NOKIA105_CASET,c);      //x-addres//0x2a
 writeNokiaSPI(NOKIA105_NOP,d);           //xsta:BIT0-7
-writeNokiaSPI(x+2,d);                    //xsta:BIT0-7
+writeNokiaSPI(x,d);                    //xsta:BIT0-7
 writeNokiaSPI(NOKIA105_NOP,d);           //xend:BIT0-7
-writeNokiaSPI(0x83,d);                   //xend:BIT0-7
+writeNokiaSPI(WIDTH,d);                   //xend:BIT0-7
 
 writeNokiaSPI(NOKIA105_PASET,c);      //y-address //0x2b
 writeNokiaSPI(NOKIA105_NOP,d);           //xend:BIT0-7
 writeNokiaSPI(y,d);                      //Ysta:BIT0-7
 writeNokiaSPI(NOKIA105_NOP,d);           //xend:BIT0-7
-writeNokiaSPI(0xA1,d);                   //xend:BIT0-7
+writeNokiaSPI(HEIGHT,d);                   //xend:BIT0-7
 
 writeNokiaSPI(NOKIA105_RAMWR,c);      //RAMWR//0x2c
 }
@@ -339,20 +326,32 @@ writeNokiaSPI(NOKIA105_RAMWR,c);//0x2c
 void Nokia105:: drawPixel(int16_t x, int16_t y, uint16_t color) {
 if ((x < 0) || (x >= WIDTH) || (y < 0) || (y >= HEIGHT))
     return;
-
+uint8_t hi = color >> 8, lo = color;
 setDrawPositionAxis(x, y, x, y);
-writeNokiaSPI(color >> 8,d);
-writeNokiaSPI(color,d);
+writeNokiaSPI(hi,d);
+writeNokiaSPI(lo,d);
 }
 
+void Nokia105:: pushFastPixel(uint32_t length, const void* color) { //fast image processing
+uint16_t *data = (uint16_t*)color;
+uint8_t hi,lo;
+while (length--) {
+hi = *data >> 8;
+lo = *data;
+writeNokiaSPI(hi,d);
+writeNokiaSPI(lo,d);
+data++;
+}
+}
 
-void Nokia105:: image1d (uint16_t w, uint16_t h, uint16_t shiftX,uint16_t shiftY, const uint16_t image[] ) {
-int l = 0;
-for (int y = 0; y < h; y++) { //h
-  for (int x = 0; x < w; x++) { //w
-    drawPixel( x+shiftX, y+shiftY, pgm_read_word(&(image[l]))); //research
-    l++;
-    }
+void Nokia105:: image1d (uint16_t w, uint16_t h, uint16_t shiftX,uint16_t shiftY, const uint16_t * image ) {
+uint16_t  buffer[w];
+setDrawPositionAxis(shiftX, shiftY, shiftX + w - 1, shiftY + h - 1 );
+for (int32_t y = 0; y < h; y++) { //h
+  for (int32_t x = 0; x < w; x++) { //w
+    buffer[x] = pgm_read_word(&image[y * w + x]); //line by line data of image store in buuffer then send.
+  }
+  pushFastPixel(w, buffer); //tft_espi
   }
 }
 //--------------------------------Working---------------------------------------------------
@@ -446,12 +445,10 @@ for (int16_t j = 0; j < h; j++, y++) {
 void Nokia105:: backgroundColor(uint16_t c) {
 uint8_t x, y, hi = c >> 8, lo = c;
 setDrawPositionAxis(0, 0, WIDTH-1, HEIGHT-1);
-
-for( y = HEIGHT; y > 0; y--) {
-  for(x = WIDTH; x > 0; x--) {
+int length = totalPixals;
+while (--length) {
     writeNokiaSPI(hi,d);
     writeNokiaSPI(lo,d);
-  }
 }
 }
 
