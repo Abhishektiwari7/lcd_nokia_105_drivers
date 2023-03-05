@@ -50,13 +50,15 @@
 #include "lcd.h"
 #include "image.h"
 
-
-// const int _CS    = 15;
-// const int _RESET = 19;
-// const int _SCLK  = 18;
-// const int _SID   = 23; // Mosi
-// Nokia105 display( _SID,  _SCLK, _RESET, _CS);
-Nokia105 display( 0, 0, 0, 0);
+//---bitbang pins------------------------------
+const int _CS    = 15;
+const int _RESET = 19;
+const int _SCLK  = 18;
+const int _SID   = 23; // Mosi
+//Backlight Default Gpio4 //PWM BRIGHTNESS
+Nokia105 display( _SID,  _SCLK, _RESET, _CS);
+//--------------------------------------------
+//Nokia105 display( 0, 0, 0, 0); //for internal SPI hardware default vspi
 void displayFunctions(int test) {
   switch (test) {
 
@@ -182,15 +184,15 @@ display.setDrawPosition(128,160);
 display.backgroundColor(BLUE);
 display.displayClear();
 ESP_LOGI(TAG, "APP main - Display Setup Completed, Functions are Activated");
- while (1) {
-    for(int i = 1; i < 28; i++) {
-    displayFunctions(i);
-    vTaskDelay(3000 / portTICK_PERIOD_MS);
-    display.displayClear();
-   }
-    //display.setLcdBrightness(analogRead(4));
-   // display.printDigit(analogRead(A2),10,10,GREEN,BLACK);
- }
+while (1) {
+  for(int i = 1; i < 28; i++) {
+  displayFunctions(i);
+  vTaskDelay(3000 / portTICK_PERIOD_MS);
+  display.displayClear();
+  }
+//display.setLcdBrightness(analogRead(4));
+//display.printDigit(analogRead(A2),10,10,GREEN,BLACK);
+}
 }
 
 

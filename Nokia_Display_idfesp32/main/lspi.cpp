@@ -36,13 +36,24 @@
 #include "lcd.h" //totalpixels
 
 //----------------------Set or Clear of bit-----digitalwrite is very slow----------------------------
-#define LCD_CS_High()    { gpio_set_level((gpio_num_t)_SPIDEVICE_CS, 1);  } 
-#define LCD_CS_Low()     { gpio_set_level((gpio_num_t)_SPIDEVICE_CS, 0);  } 
-#define LCD_SDA_High()   { gpio_set_level((gpio_num_t)_SPIDEVICE_SDA,1);  } 
-#define LCD_SDA_Low()    { gpio_set_level((gpio_num_t)_SPIDEVICE_SDA,0);  } 
-#define LCD_SCK_High()   { gpio_set_level((gpio_num_t)_SPIDEVICE_SCK,1);  } 
-#define LCD_SCK_Low()    { gpio_set_level((gpio_num_t)_SPIDEVICE_SCK,0);  }
+//--too slow for me ;)
+// #define LCD_CS_High()    { gpio_set_level((gpio_num_t)_SPIDEVICE_CS, 1);  } 
+// #define LCD_CS_Low()     { gpio_set_level((gpio_num_t)_SPIDEVICE_CS, 0);  } 
+// #define LCD_SDA_High()   { gpio_set_level((gpio_num_t)_SPIDEVICE_SDA,1);  } 
+// #define LCD_SDA_Low()    { gpio_set_level((gpio_num_t)_SPIDEVICE_SDA,0);  } 
+// #define LCD_SCK_High()   { gpio_set_level((gpio_num_t)_SPIDEVICE_SCK,1);  } 
+// #define LCD_SCK_Low()    { gpio_set_level((gpio_num_t)_SPIDEVICE_SCK,0);  }
+//------Lets manipulate registers directly--------------
+#define GPIO_OUT_W1TS_REG (0x3ff44008) //to set HIGH
+#define GPIO_OUT_W1TC_REG (0x3ff4400C) //to set LOW
+#define LCD_CS_High()    { REG_WRITE(GPIO_OUT_W1TS_REG, BIT(_SPIDEVICE_CS));   }
+#define LCD_CS_Low()     { REG_WRITE(GPIO_OUT_W1TC_REG, BIT(_SPIDEVICE_CS));   } 
+#define LCD_SDA_High()   { REG_WRITE(GPIO_OUT_W1TS_REG, BIT(_SPIDEVICE_SDA));  } 
+#define LCD_SDA_Low()    { REG_WRITE(GPIO_OUT_W1TC_REG, BIT(_SPIDEVICE_SDA));  } 
+#define LCD_SCK_High()   { REG_WRITE(GPIO_OUT_W1TS_REG, BIT(_SPIDEVICE_SCK));  } 
+#define LCD_SCK_Low()    { REG_WRITE(GPIO_OUT_W1TC_REG, BIT(_SPIDEVICE_SCK));  }
 
+//-------------------end---------------------------------
 uint8_t	_SPIDEVICE_CS,     //chip select activelow
         _SPIDEVICE_SDA,	   //Mosi /miso
         _SPIDEVICE_SCK,    //clock
@@ -162,7 +173,7 @@ _SPIDEVICE_SDA   = _SID; //Mosi
 _SPIDEVICE_SCK   = _SCLK;
 _SPIDEVICE_CS    = _CS;
 if (_hwSPI == 0) {
-  ESP_LOGI(TAG, "intial spi");
+  ESP_LOGI(TAG, "Init BitBang SPI");
   gpio_reset_pin((gpio_num_t)_SPIDEVICE_SDA);
   gpio_reset_pin((gpio_num_t)_SPIDEVICE_SCK);
   gpio_reset_pin((gpio_num_t)_SPIDEVICE_CS);
