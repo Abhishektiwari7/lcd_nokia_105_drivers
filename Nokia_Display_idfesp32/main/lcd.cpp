@@ -500,32 +500,89 @@ while (x < y) {
 }
 }
 
-void Nokia105::  printDigit(unsigned int a,int16_t x, int16_t y,uint16_t forgroundColor,uint16_t backgroundColor) {
-//convet int to string to character the print data but overlapping problem occured when number 4 digit back to 2 digit need some display clear without blink effect   
-/*uint8_t sizeofinput = HEIGHT*WIDTH ; //need to update //255
-char connverter[sizeofinput];
-String str = String(a);  
-str.toCharArray(connverter,sizeofinput);
-*/ //arduino heap memmory got mad at me//https://arduino.stackexchange.com/questions/42986/convert-int-to-char*
-int count = int(log10(a) + 1);
-char cstr[count];
-itoa(a, cstr, 10); //https://cplusplus.com/reference/cstdlib/itoa/
-//---------------------------------------upgrade required-------------------------------------------------------
-printString(cstr,x,y,forgroundColor,backgroundColor);
+int Nokia105:: countDigit(long long n) { // to get number on digits in input passing number :) used to give space in float print
+if (n == 0) //only 1 digit
+  return 1;
+int count = 0;
+while (n != 0) { //check until no number being left 
+  n = n / 10;
+  ++count;
+}
+return count;
+}
 
-//padding to avoid overlap text
-if (a < 10) { //1 digit
-  for(int i = 1; i<4; i++) 
-  printString(" ",x+(i*8),y,backgroundColor,backgroundColor);
-} else if ( a >= 10 && a < 100 )  { //2 digit
-  printString(" ",x+16,y,backgroundColor,backgroundColor);
-} else if ( a >= 100 && a < 1000 )  { //3 digit
-  printString(" ",x+24,y,backgroundColor,backgroundColor);
-}  else if ( a >= 1000 && a < 10000 )  { //4 digit
-  printString(" ",x+32,y,backgroundColor,backgroundColor);
+void Nokia105::  printDigitInteger(int32_t Inumber,int16_t x, int16_t y,uint16_t forgroundColor,uint16_t backgroundColor) {
+// a = a + 48;
+// unsigned char b = a;
+// printSingleChar (b,x,y,forgroundColor,backgroundColor);
+//-------------------------thanks ben heck :)----------------
+//Send up to a 9 digit decimal value to memory
+	int zPad = 0;							//Flag for zero padding
+	uint32_t divider = 100000000;			//Divider starts at 900 million = max decimal printable is 999,999,999
+
+	for (int xx = 0 ; xx < 9 ; xx++) {		//9 digit number
+		if (Inumber >= divider) {
+			uint8_t intnum =  '0' + (Inumber / divider);
+			printSingleChar (intnum,x,y,forgroundColor,backgroundColor);
+      x=x+8;
+      Inumber %= divider;
+			zPad = 1;
+		}
+		else if (zPad || divider == 1) {			
+			printSingleChar ('0',x,y,forgroundColor,backgroundColor);
+      x=x+8;
+		}
+		divider /= 10;
+	}
+}
+
+void Nokia105:: printDigitFloat(double fnumber,uint8_t digits, int16_t x, int16_t y,uint16_t forgroundColor,uint16_t backgroundColor) {
+//-------check if given number is valid or not?--------------------------------------------
+if (isnan(fnumber)) return printString("nan",x,y,backgroundColor,backgroundColor);
+if (isinf(fnumber)) return printString("inf",x,y,backgroundColor,backgroundColor);
+if (fnumber > 4294967040.0) return printString("ovf",x,y,backgroundColor,backgroundColor);  // constant determined empirically
+if (fnumber <-4294967040.0) return printString("ovf",x,y,backgroundColor,backgroundColor);  // constant determined empirically
+
+// Handle negative numbers
+if (fnumber < 0.0) {
+  printString("-",x,y,forgroundColor,backgroundColor);
+  x = x+8; // character size on screen
+  fnumber = -fnumber;
+}
+
+double rounding = 0.5;
+for (uint8_t i = 0; i < digits; ++i) { // Round correctly so that print(1.999, 2) prints as "2.00"
+  rounding /= 10.0;
+}
+fnumber += rounding;
+
+unsigned long int_part = (unsigned long)fnumber; // Extract the integer part of the number
+double remainder = fnumber - (double)int_part;
+
+if (int_part == 0) { //if 1st interger has zero
+printSingleChar ('0',x,y,forgroundColor,backgroundColor);
+x = x+8; // character size on screen
+} else {
+  printDigitInteger(int_part,x,y,forgroundColor,backgroundColor); //print it
+  x =  countDigit(int_part) * 8; // character size on screen count digit to use give space
+}
+
+if (digits > 0) { // Print the decimal point, but only if there are digits beyond
+  printString(".",x,y,forgroundColor,backgroundColor);
+  x = x+8; // character size on screen
+}
+
+// Extract digits from the remainder one at a time
+while (digits-- > 0) {
+  remainder *= 10.0;
+  unsigned int toPrint = (unsigned int)(remainder);
+  printDigitInteger(toPrint,x,y,forgroundColor,backgroundColor);
+  x = x+8;
+  remainder -= toPrint; 
 }
 
 }
+  
 
 void Nokia105:: lineVertical(int16_t x, int16_t y, int16_t h, uint16_t color) {
 if ((x < 0) || (x >= WIDTH ) || (y >= HEIGHT)) return; 

@@ -155,21 +155,28 @@ void displayFunctions(int test) {
     break;
 
   case 24:
-   display.printDigit(100,10,10,GREEN,BLACK);
+   display.printDigitInteger(111000999,40,40,GREEN,BLACK); //limit 999,999,999
     break;
 
   case 25:
     display.displayClear();
     break;
 
-  case 26:
-    // display.drawtext('8',50,50,BLUE);
+  case 26: {
+      float Fnum = 1234562.1234;
+      uint8_t digits = 4;
+      display.printDigitFloat(Fnum,digits,1,10,GREEN,BLACK);
+    }
     break;
 
   case 27:
     // display.image2d ( 120, 80, 0,0, abhishekme ); //working by need to define array[][y]
     break;
-
+  
+  case 28:
+    // display.drawtext('8',50,50,BLUE);
+    break;
+  
   default:
     // statements
     break;
@@ -184,12 +191,13 @@ display.setDrawPosition(128,160);
 display.backgroundColor(BLUE);
 display.displayClear();
 ESP_LOGI(TAG, "APP main - Display Setup Completed, Functions are Activated");
+
 while (1) {
   for(int i = 1; i < 28; i++) {
-  displayFunctions(i);
-  vTaskDelay(3000 / portTICK_PERIOD_MS);
-  display.displayClear();
-  }
+    displayFunctions(i);
+    vTaskDelay(3000 / portTICK_PERIOD_MS);
+   display.displayClear();
+ }
 //display.setLcdBrightness(analogRead(4));
 //display.printDigit(analogRead(A2),10,10,GREEN,BLACK);
 }

@@ -96,7 +96,16 @@ class Nokia105 final {
     spi proceed by defined gpio.
   */
   /**********************************************************************/
-		
+	
+  int countDigit(long long n); 
+  /**********************************************************************/
+  /*!
+    @brief    Count number of digits
+    @param    to get number on digits in input passing number 
+              :) used to give space in float print
+  */
+  /**********************************************************************/
+
 	void	initDisplay(),
   /**********************************************************************/
   /*!
@@ -166,11 +175,20 @@ class Nokia105 final {
   */
   /**********************************************************************/
 				
-	printDigit(unsigned int a, int16_t x, int16_t y,uint16_t forgroundColor,uint16_t backgroundColor),
+	printDigitInteger(int32_t Inumber, int16_t x, int16_t y,uint16_t forgroundColor,uint16_t backgroundColor),
   /**********************************************************************/
   /*!
-    @brief    digit print working upto 10,000 only unsigned integers 
+    @brief    digit print working upto 999,999,999 only unsigned integers 
     @param    
+  */
+  /**********************************************************************/
+
+  printDigitFloat(double fnumber,uint8_t digits, int16_t x, int16_t y,uint16_t forgroundColor,uint16_t backgroundColor),
+  /**********************************************************************/
+  /*!
+    @brief    float digit print function
+    @param    fnumber is float number. digits is how many digit after 
+              point need to print on screen.
   */
   /**********************************************************************/
 
