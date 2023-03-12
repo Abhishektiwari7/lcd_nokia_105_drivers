@@ -564,7 +564,7 @@ printSingleChar ('0',x,y,forgroundColor,backgroundColor);
 x = x+8; // character size on screen
 } else {
   printDigitInteger(int_part,x,y,forgroundColor,backgroundColor); //print it
-  x =  countDigit(int_part) * 8; // character size on screen count digit to use give space
+  x = (x +  ( countDigit(int_part) * 8 ) ); // character size on screen count digit to use give space
 }
 
 if (digits > 0) { // Print the decimal point, but only if there are digits beyond
