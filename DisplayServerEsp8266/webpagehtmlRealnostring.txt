@@ -1,0 +1,46 @@
+<!DOCTYPE HTML><html>
+<head>
+  <title>ESP-IDF Programmable Power Supply Web Server</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <link rel="icon" href="data:,">
+  <style>
+    html {font-family: Arial; display: inline-block; text-align: center;}
+    p {  font-size: 1.2rem;}
+    body {  margin: 0;}
+    .topnav { overflow: hidden; background-color: #4B1D3F; color: white; font-size: 1.7rem; }
+    .content { padding: 70px; }
+    .card { background-color: white; box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5); }
+    .cards { max-width: 700px; margin: 0 auto; display: grid; grid-gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+    .reading {  font-size: 2.8rem;}
+    .head   {  font-family: "Inconsolata"; font-size:3rem;}
+    .card.voltage { color: #0e7c7b; }
+    .card.raw_adc { color: #d62246; }
+    .card.current { color: #3fca6b; }
+    .card.update_me { color: #d62246; }
+    .input{width: 200px;margin:auto;height:20px;display:block;}
+    .submitbtn{margin-top:10px;width:100px;height:25px;background-color:green;color:#fff;border-radius:7px;border:none;}
+  </style>
+</head>
+<body>
+  <div class="topnav">
+    <h3><i class="fas fa-solid fa-meteor"></i>Display Web Server</h3>
+  </div>
+  <div class="content">
+    <div class="cards">
+         <div class="card voltage">
+         <h4><i class = "head"> Write Any Text </i><i class="fas fa-solid fa-mask"></i></h4> <form action="/get"> <input type="text" name="v_" placeholder="Display...">
+         <p> <input type="submit" value="Submit"  class = "submitbtn" </p>
+          </form><br>
+      </div>
+    </div>
+  </div>
+    <div class="content">
+    <div class="cards">
+     <div class="card raw_adc">
+        <h4><i class=" fas fa-sharp fa-pen"></i> Powered By Abhishek Tiwari</h4><p></p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

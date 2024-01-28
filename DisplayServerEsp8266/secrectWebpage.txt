@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+h1 {
+ color:#40B3DF;
+ letter-spacing:12px;
+ font-size:50px;
+ position:relative;
+ left:25px;
+ top:30px;
+}
+p  {
+  color: red;
+  font-family: courier;
+  font-size: 50px;
+  background-color:#B4009E;
+  color:#ffffff;
+}
+</style>
+</head>
+
+<body>
+<h1 style="text-align:center;" > Welcome To Secret Page!</h1>
+<p  style="text-align:center;"> I too <span style="font-size:500%;color:red;">&hearts;</span> you </p>
+</body>
+</html>
